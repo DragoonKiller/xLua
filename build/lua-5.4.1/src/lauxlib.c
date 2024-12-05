@@ -40,8 +40,8 @@
 */
 
 
-#define LEVELS1	10	/* size of the first part of the stack */
-#define LEVELS2	11	/* size of the second part of the stack */
+#define LEVELS1 80	/* size of the first part of the stack */
+#define LEVELS2	80	/* size of the second part of the stack */
 
 
 

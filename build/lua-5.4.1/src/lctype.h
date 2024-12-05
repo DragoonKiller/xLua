@@ -36,10 +36,15 @@
 #include "llimits.h"
 
 
+// alphabet,            0x01, 0000 0001
 #define ALPHABIT	0
+// digit,               0x02, 0000 0010
 #define DIGITBIT	1
+// printable,           0x04, 0000 0100
 #define PRINTBIT	2
+// space or invincible, 0x08, 0000 1000
 #define SPACEBIT	3
+// hex digit,           0x10, 0001 0000
 #define XDIGITBIT	4
 
 
@@ -68,10 +73,15 @@
 ** the character either is an upper-case letter or is unchanged by
 ** the transformation, which holds for lower-case letters and '.'.)
 */
-#define ltolower(c)  \
-  check_exp(('A' <= (c) && (c) <= 'Z') || (c) == ((c) | ('A' ^ 'a')),  \
-            (c) | ('A' ^ 'a'))
+// #define ltolower(c)  \
+//   check_exp(('A' <= (c) && (c) <= 'Z') || (c) == ((c) | ('A' ^ 'a')),  \
+//             (c) | ('A' ^ 'a'))
 
+// Karatoga: it also support #$%&*!. not support @ and ^.
+// Well let's not use it, I want to support other characters.
+#include <ctype.h>
+
+#define ltolower(c) tolower(c)
 
 /* one entry for each character and for -1 (EOZ) */
 LUAI_DDEC(const lu_byte luai_ctype_[UCHAR_MAX + 2];)

@@ -1225,6 +1225,62 @@ LUA_API void* xlua_gl(lua_State *L) {
 	return G(L);
 }
 
+// ================================================================================================
+// Custom api part
+// ================================================================================================
+
+// table to pointer, directly return its pointer value.
+LUA_API int lua_tbtoptr (lua_State *L) {
+  const void *o = lua_topointer(L, -1);
+  lua_pushinteger(L, (int64_t)o);
+  return 0;
+}
+
+LUA_API int xlua_isinteger (lua_State *L) {
+  lua_pushboolean(L, lua_isinteger(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_isnumber (lua_State *L) {
+  lua_pushboolean(L, lua_isnumber(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_isstring (lua_State *L) {
+  lua_pushboolean(L, lua_isstring(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_isfunction (lua_State *L) {
+  lua_pushboolean(L, lua_isfunction(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_istable (lua_State *L) {
+  lua_pushboolean(L, lua_istable(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_isboolean (lua_State *L) {
+  lua_pushboolean(L, lua_isboolean(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_isnil (lua_State *L) {
+  lua_pushboolean(L, lua_isnil(L, -1));
+  return 1;
+}
+
+LUA_API int xlua_variadicn (lua_State *L) {
+  lua_pushinteger(L, lua_gettop(L));
+  return 1;
+}
+
+// ================================================================================================
+// CUstom part end
+// ================================================================================================
+
+  
 static const luaL_Reg xlualib[] = {
 	{"sethook", profiler_set_hook},
 	{"genaccessor", gen_css_access},
@@ -1232,8 +1288,28 @@ static const luaL_Reg xlualib[] = {
 	{NULL, NULL}
 };
 
+static const luaL_Reg karatogalib[] = {
+	{"ID", lua_tbtoptr},
+	{"isinteger", xlua_isinteger},
+	{"isnumber", xlua_isnumber},
+	{"isstring", xlua_isstring},
+	{"isfunction", xlua_isfunction},
+	{"istable", xlua_istable},
+	{"isboolean", xlua_isboolean},
+	{"isnil", xlua_isnil},
+	{"VariadicN", xlua_variadicn},
+	{NULL, NULL}
+};
+
 LUA_API void luaopen_xlua(lua_State *L) {
 	luaL_openlibs(L);
+	
+	int i = 0;
+	while(karatogalib[i].func != NULL)
+	{
+		lua_register(L, karatogalib[i].name, karatogalib[i].func);
+		i++;
+	}
 	
 #if LUA_VERSION_NUM >= 503
 	luaL_newlib(L, xlualib);
