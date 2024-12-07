@@ -1230,49 +1230,70 @@ LUA_API void* xlua_gl(lua_State *L) {
 // ================================================================================================
 
 // table to pointer, directly return its pointer value.
-LUA_API int lua_tbtoptr (lua_State *L) {
+static int lua_tbtoptr (lua_State *L) {
   const void *o = lua_topointer(L, -1);
   lua_pushinteger(L, (int64_t)o);
-  return 0;
+  return 1;
 }
 
-LUA_API int xlua_isinteger (lua_State *L) {
+static int xlua_isinteger (lua_State *L) {
   lua_pushboolean(L, lua_isinteger(L, -1));
   return 1;
 }
 
-LUA_API int xlua_isnumber (lua_State *L) {
+static int xlua_isnumber (lua_State *L) {
   lua_pushboolean(L, lua_isnumber(L, -1));
   return 1;
 }
 
-LUA_API int xlua_isstring (lua_State *L) {
+static int xlua_isstring (lua_State *L) {
   lua_pushboolean(L, lua_isstring(L, -1));
   return 1;
 }
 
-LUA_API int xlua_isfunction (lua_State *L) {
+static int xlua_isfunction (lua_State *L) {
   lua_pushboolean(L, lua_isfunction(L, -1));
   return 1;
 }
 
-LUA_API int xlua_istable (lua_State *L) {
+static int xlua_istable (lua_State *L) {
   lua_pushboolean(L, lua_istable(L, -1));
   return 1;
 }
 
-LUA_API int xlua_isboolean (lua_State *L) {
+static int xlua_isboolean (lua_State *L) {
   lua_pushboolean(L, lua_isboolean(L, -1));
   return 1;
 }
 
-LUA_API int xlua_isnil (lua_State *L) {
+static int xlua_isnil (lua_State *L) {
   lua_pushboolean(L, lua_isnil(L, -1));
   return 1;
 }
 
-LUA_API int xlua_variadicn (lua_State *L) {
+static int xlua_variadicn (lua_State *L) {
   lua_pushinteger(L, lua_gettop(L));
+  return 1;
+}
+
+static int xlua_bool (lua_State *L) {
+  if(lua_gettop(L) != 1) return 0;
+  // is bool == true, or is not null
+  if((lua_isboolean(L, 1) && lua_toboolean(L, 1) != 0) || !lua_isnil(L, 1)) {
+	lua_pushboolean(L, 1);
+  } else {
+	lua_pushboolean(L, 0);
+  }
+  return 1;
+}
+
+static int xlua_nullify (lua_State *L) {
+  if(lua_gettop(L) != 1) return 0;
+  if(lua_isboolean(L, 1) && lua_toboolean(L, 1) == 0 || lua_isnil(L, 1)) {
+	lua_pushnil(L);
+  } else {
+	lua_pushvalue(L, 1);
+  }
   return 1;
 }
 
@@ -1298,6 +1319,8 @@ static const luaL_Reg karatogalib[] = {
 	{"isboolean", xlua_isboolean},
 	{"isnil", xlua_isnil},
 	{"VariadicN", xlua_variadicn},
+	{"bool", xlua_bool},
+	{"nullify", xlua_nullify},
 	{NULL, NULL}
 };
 

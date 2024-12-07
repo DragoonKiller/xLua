@@ -701,6 +701,196 @@ static int math_log10 (lua_State *L) {
 
 
 
+
+// ================================================================================================
+// Karatoga
+// ================================================================================================
+
+static lua_Number frac(lua_Number t) {
+  return t - floor(t);
+}
+
+static lua_Number lerp(lua_Number t, lua_Number a, lua_Number b) {
+  return a + (b - a) * t;
+}
+
+static lua_Number clamp(lua_Number x, lua_Number min, lua_Number max) {
+  return (x < min) ? min : (x > max) ? max : x;
+}
+
+static int math_lerp(lua_State *L) {
+  lua_Number a = luaL_checknumber(L, 1);
+  lua_Number b = luaL_checknumber(L, 2);
+  lua_Number t = luaL_checknumber(L, 3);
+  lua_pushnumber(L, lerp(t, a, b));
+  return 1;
+}
+
+static int math_clamp(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_Number min = luaL_checknumber(L, 2);
+  lua_Number max = luaL_checknumber(L, 3);
+  lua_pushnumber(L, clamp(x, min, max));
+  return 1;
+}
+
+static int math_smoothstep(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_Number edge0 = luaL_checknumber(L, 2);
+  lua_Number edge1 = luaL_checknumber(L, 3);
+  x = (x - edge0) / (edge1 - edge0);
+  x = (x < 0) ? 0 : (x > 1) ? 1 : x;
+  lua_pushnumber(L, x * x * (3 - 2 * x));
+  return 1;
+}
+
+static int math_remap(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_Number inMin = luaL_checknumber(L, 2);
+  lua_Number inMax = luaL_checknumber(L, 3);
+  lua_Number outMin = luaL_checknumber(L, 4);
+  lua_Number outMax = luaL_checknumber(L, 5);
+  lua_pushnumber(L, outMin + (outMax - outMin) * (x - inMin) / (inMax - inMin));
+  return 1;
+}
+
+static int math_sign(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_pushnumber(L, (x > 0) ? 1 : (x < 0) ? -1 : 0);
+  return 1;
+}
+
+static int math_round(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_pushinteger(L, (lua_Integer)(x + ((x < 0) ? -0.5 : 0.5)));
+  return 1;
+}
+
+static lua_Number moveto(lua_Number v, lua_Number target, lua_Number maxd) {
+  lua_Number d = target - v;
+  if (d > maxd) {
+    v += maxd;
+  } else if (d < -maxd) {
+    v -= maxd;
+  } else {
+    v = target;
+  }
+  return v;
+}
+
+static int math_moveto(lua_State *L) {
+  lua_Number v = luaL_checknumber(L, 1);
+  lua_Number target = luaL_checknumber(L, 2);
+  lua_Number maxd = luaL_checknumber(L, 3);
+  lua_pushnumber(L, moveto(v, target, maxd));
+  return 1;
+}
+
+
+static int math_anglemoveto(lua_State *L) {
+    double v = luaL_checknumber(L, 1);
+    double to = luaL_checknumber(L, 2);
+    double maxDelta = luaL_checknumber(L, 3);
+
+    double to1 = fmod(to, 360.0);
+    double to2 = to1 - 360.0;
+    double to3 = to1 + 360.0;
+    v = fmod(v, 360.0);
+
+    double d1 = fabs(v - to1);
+    double d2 = fabs(v - to2);
+    double d3 = fabs(v - to3);
+
+    double result;
+    if (d1 < d2 && d1 < d3) {
+        result = moveto(v, to1, maxDelta);
+    } else if (d2 < d3) {
+        result = moveto(v, to2, maxDelta);
+    } else {
+        result = moveto(v, to3, maxDelta);
+    }
+
+    lua_pushnumber(L, result);
+    return 1; // Return result
+}
+
+static int math_angle(lua_State *L) {
+  
+    // Get dir.x
+    lua_getfield(L, 1, "x");
+    double x = luaL_checknumber(L, -1);
+    lua_pop(L, 1);
+
+    // Get dir.y
+    lua_getfield(L, 1, "y");
+    double y = luaL_checknumber(L, -1);
+    lua_pop(L, 1);
+
+    // Calculate the angle
+    double rad = atan2(y, x);       // atan2 gives the angle in radians
+    double angle = rad * (180.0 / PI); // Convert radians to degrees
+
+    // Adjust to range [0, 360)
+    if (angle < 0) {
+        angle += 360.0;
+    }
+
+    // Push the result
+    lua_pushnumber(L, angle);
+    return 1; // Return 1 value (the angle)
+}
+
+static int math_inrange(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_Number min = luaL_checknumber(L, 2);
+  lua_Number max = luaL_checknumber(L, 3);
+  lua_pushboolean(L, (x >= min) && (x <= max));
+  return 1;
+}
+
+static int math_inrangex(lua_State *L) {
+  lua_Number x = luaL_checknumber(L, 1);
+  lua_Number min = luaL_checknumber(L, 2);
+  lua_Number max = luaL_checknumber(L, 3);
+  lua_pushboolean(L, (x > min) && (x < max));
+  return 1;
+}
+
+static int math_angleInRange(lua_State *L) {
+    double angle = luaL_checknumber(L, 1);
+    double min = luaL_checknumber(L, 2);
+    double max = luaL_checknumber(L, 3);
+    angle = fmod(angle, 360.0);
+    min = fmod(min, 360.0);
+    max = fmod(max, 360.0);
+    if (min < max) {
+        lua_pushboolean(L, angle >= min && angle <= max);
+    } else {
+        lua_pushboolean(L, angle >= min || angle <= max);
+    }
+    return 1;
+}
+
+
+static int math_pingpong(lua_State *L) {
+  lua_Number t = luaL_checknumber(L, 1);
+  lua_Number p = luaL_checknumber(L, 2);
+  // value range in [0, 1]
+  if(lua_gettop(L) == 2) {
+    lua_pushnumber(L, 1 - fabs(2 * frac(t / p / 2) - 1));
+    return 1;
+  }
+  // value range in [min, max]
+  if(lua_gettop(L) == 4) {
+    lua_Number min = luaL_checknumber(L, 3);
+    lua_Number max = luaL_checknumber(L, 4);
+    lua_pushnumber(L, lerp(1 - fabs(2 * frac(t / p / 2) - 1), min, max));
+    return 1;
+  }
+  return 0;
+}
+
+
 static const luaL_Reg mathlib[] = {
   {"abs",   math_abs},
   {"acos",  math_acos},
@@ -723,16 +913,22 @@ static const luaL_Reg mathlib[] = {
   {"sqrt",  math_sqrt},
   {"tan",   math_tan},
   {"type", math_type},
-#if defined(LUA_COMPAT_MATHLIB)
-  {"atan2", math_atan},
-  {"cosh",   math_cosh},
-  {"sinh",   math_sinh},
-  {"tanh",   math_tanh},
-  {"pow",   math_pow},
-  {"frexp", math_frexp},
-  {"ldexp", math_ldexp},
-  {"log10", math_log10},
-#endif
+  
+  /* Kratoga Customized */
+  {"lerp", math_lerp},
+  {"clamp", math_clamp},
+  {"smoothstep", math_smoothstep},
+  {"remap", math_remap},
+  {"sign", math_sign},
+  {"round", math_round},
+  {"moveto", math_moveto},
+  {"anglemoveto", math_anglemoveto},
+  {"angle", math_angle},
+  {"inrange", math_inrange},
+  {"inrangex", math_inrangex},
+  {"inrangeangle", math_angleInRange},
+  {"pingpong", math_pingpong},
+  
   /* placeholders */
   {"random", NULL},
   {"randomseed", NULL},
@@ -740,7 +936,7 @@ static const luaL_Reg mathlib[] = {
   {"huge", NULL},
   {"maxinteger", NULL},
   {"mininteger", NULL},
-  {NULL, NULL}
+  {NULL, NULL},
 };
 
 

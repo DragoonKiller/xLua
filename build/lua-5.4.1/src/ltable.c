@@ -704,7 +704,6 @@ const TValue *luaH_getint (Table *t, lua_Integer key) {
   }
 }
 
-
 /*
 ** search function for short strings
 */
