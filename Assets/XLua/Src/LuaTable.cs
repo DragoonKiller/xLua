@@ -25,6 +25,8 @@ namespace XLua
 {
     public partial class LuaTable : LuaBase
     {
+        public bool valid => luaEnv.rawL != IntPtr.Zero && luaReference != 0;
+        
         public LuaTable(int reference, LuaEnv luaenv) : base(reference, luaenv)
         {
         }
@@ -169,7 +171,7 @@ namespace XLua
 #endif
         }
 
-        public void SetInPath<T>(string path, T val)
+        public void setInPath<T>(string path, T val)
         {
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -190,7 +192,7 @@ namespace XLua
 #endif
         }
 
-        [Obsolete("use no boxing version: GetInPath/SetInPath Get/Set instead!")]
+        [Obsolete("use no boxing version: GetInPath/setInPath Get/Set instead!")]
         public object this[string field]
         {
             get
@@ -199,11 +201,11 @@ namespace XLua
             }
             set
             {
-                SetInPath(field, value);
+                setInPath(field, value);
             }
         }
 
-        [Obsolete("use no boxing version: GetInPath/SetInPath Get/Set instead!")]
+        [Obsolete("use no boxing version: GetInPath/setInPath Get/Set instead!")]
         public object this[object field]
         {
             get
@@ -353,7 +355,14 @@ namespace XLua
             {
 #endif
                 push(luaEnv.L);
-                metaTable.push(luaEnv.L);
+                if(metaTable == null)
+                {
+                    LuaAPI.lua_pushnil(luaEnv.L);
+                }
+                else
+                {
+                    metaTable.push(luaEnv.L);
+                }
                 LuaAPI.lua_setmetatable(luaEnv.L, -2);
                 LuaAPI.lua_pop(luaEnv.L, 1);
 #if THREAD_SAFE || HOTFIX_ENABLE

@@ -23,126 +23,14 @@ namespace XLua
 {
     public partial class LuaFunction : LuaBase
     {
+        public bool valid => luaEnv.rawL != IntPtr.Zero && luaReference != 0;
+        
         public LuaFunction(int reference, LuaEnv luaenv) : base(reference, luaenv)
         {
         }
-
-        //Action和Func是方便使用的无gc api，如果需要用到out，ref参数，建议使用delegate
-        //如果需要其它个数的Action和Func， 这个类声明为partial，可以自己加
-        public void Action<T>(T a)
-        {
-#if THREAD_SAFE || HOTFIX_ENABLE
-            lock (luaEnv.luaEnvLock)
-            {
-#endif
-                var L = luaEnv.L;
-                var translator = luaEnv.translator;
-                int oldTop = LuaAPI.lua_gettop(L);
-                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-                LuaAPI.lua_getref(L, luaReference);
-                translator.PushByType(L, a);
-                int error = LuaAPI.lua_pcall(L, 1, 0, errFunc);
-                if (error != 0)
-                    luaEnv.ThrowExceptionFromError(oldTop);
-                LuaAPI.lua_settop(L, oldTop);
-#if THREAD_SAFE || HOTFIX_ENABLE
-            }
-#endif
-        }
-
-        public TResult Func<T, TResult>(T a)
-        {
-#if THREAD_SAFE || HOTFIX_ENABLE
-            lock (luaEnv.luaEnvLock)
-            {
-#endif
-                var L = luaEnv.L;
-                var translator = luaEnv.translator;
-                int oldTop = LuaAPI.lua_gettop(L);
-                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-                LuaAPI.lua_getref(L, luaReference);
-                translator.PushByType(L, a);
-                int error = LuaAPI.lua_pcall(L, 1, 1, errFunc);
-                if (error != 0)
-                    luaEnv.ThrowExceptionFromError(oldTop);
-                TResult ret;
-                try
-                {
-                    translator.Get(L, -1, out ret);
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-                finally
-                {
-                    LuaAPI.lua_settop(L, oldTop);
-                }
-                return ret;
-#if THREAD_SAFE || HOTFIX_ENABLE
-            }
-#endif
-        }
-
-        public void Action<T1, T2>(T1 a1, T2 a2)
-        {
-#if THREAD_SAFE || HOTFIX_ENABLE
-            lock (luaEnv.luaEnvLock)
-            {
-#endif
-                var L = luaEnv.L;
-                var translator = luaEnv.translator;
-                int oldTop = LuaAPI.lua_gettop(L);
-                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-                LuaAPI.lua_getref(L, luaReference);
-                translator.PushByType(L, a1);
-                translator.PushByType(L, a2);
-                int error = LuaAPI.lua_pcall(L, 2, 0, errFunc);
-                if (error != 0)
-                    luaEnv.ThrowExceptionFromError(oldTop);
-                LuaAPI.lua_settop(L, oldTop);
-#if THREAD_SAFE || HOTFIX_ENABLE
-            }
-#endif
-        }
-
-        public TResult Func<T1, T2, TResult>(T1 a1, T2 a2)
-        {
-#if THREAD_SAFE || HOTFIX_ENABLE
-            lock (luaEnv.luaEnvLock)
-            {
-#endif
-                var L = luaEnv.L;
-                var translator = luaEnv.translator;
-                int oldTop = LuaAPI.lua_gettop(L);
-                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
-                LuaAPI.lua_getref(L, luaReference);
-                translator.PushByType(L, a1);
-                translator.PushByType(L, a2);
-                int error = LuaAPI.lua_pcall(L, 2, 1, errFunc);
-                if (error != 0)
-                    luaEnv.ThrowExceptionFromError(oldTop);
-                TResult ret;
-                try
-                {
-                    translator.Get(L, -1, out ret);
-                }
-                catch (Exception e)
-                {
-                    throw e;
-                }
-                finally
-                {
-                    LuaAPI.lua_settop(L, oldTop);
-                }
-                return ret;
-#if THREAD_SAFE || HOTFIX_ENABLE
-            }
-#endif
-        }
-
+        
         //deprecated
-        public object[] Call(object[] args, Type[] returnTypes)
+        public object[] CallVariant(object[] args, Type[] returnTypes)
         {
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnv.luaEnvLock)
@@ -178,9 +66,9 @@ namespace XLua
         }
 
         //deprecated
-        public object[] Call(params object[] args)
+        public object[] CallVariant(params object[] args)
         {
-            return Call(args, null);
+            return CallVariant(args, null);
         }
 
         public T Cast<T>()
@@ -202,6 +90,259 @@ namespace XLua
 #if THREAD_SAFE || HOTFIX_ENABLE
             }
 #endif
+        }
+        
+        public void Call()
+        {
+            #if THREAD_SAFE || HOTFIX_ENABLE
+                lock (luaEnv.luaEnvLock)
+                {
+            #endif
+                    var L = luaEnv.L;
+                    int oldTop = LuaAPI.lua_gettop(L);
+                    int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+                    LuaAPI.lua_getref(L, luaReference);
+                    int error = LuaAPI.lua_pcall(L, 0, 0, errFunc);
+                    if (error != 0)
+                        luaEnv.ThrowExceptionFromError(oldTop);
+                    LuaAPI.lua_settop(L, oldTop);
+            #if THREAD_SAFE || HOTFIX_ENABLE
+                }
+            #endif
+        }
+
+        //Call和CallR是方便使用的无gc api，如果需要用到out，ref参数，建议使用delegate
+        //如果需要其它个数的Call和CallR， 这个类声明为partial，可以自己加
+        public void Call<T>(T a)
+        {
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                var L = luaEnv.L;
+                var translator = luaEnv.translator;
+                int oldTop = LuaAPI.lua_gettop(L);
+                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+                LuaAPI.lua_getref(L, luaReference);
+                translator.PushByType(L, a);
+                int error = LuaAPI.lua_pcall(L, 1, 0, errFunc);
+                if (error != 0)
+                    luaEnv.ThrowExceptionFromError(oldTop);
+                LuaAPI.lua_settop(L, oldTop);
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+        }
+
+        public TResult CallR<T, TResult>(T a)
+        {
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                var L = luaEnv.L;
+                var translator = luaEnv.translator;
+                int oldTop = LuaAPI.lua_gettop(L);
+                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+                LuaAPI.lua_getref(L, luaReference);
+                translator.PushByType(L, a);
+                int error = LuaAPI.lua_pcall(L, 1, 1, errFunc);
+                if (error != 0)
+                    luaEnv.ThrowExceptionFromError(oldTop);
+                TResult ret;
+                try
+                {
+                    translator.Get(L, -1, out ret);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    LuaAPI.lua_settop(L, oldTop);
+                }
+                return ret;
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+        }
+
+        public void Call<T1, T2>(T1 a1, T2 a2)
+        {
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                var L = luaEnv.L;
+                var translator = luaEnv.translator;
+                int oldTop = LuaAPI.lua_gettop(L);
+                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+                LuaAPI.lua_getref(L, luaReference);
+                translator.PushByType(L, a1);
+                translator.PushByType(L, a2);
+                int error = LuaAPI.lua_pcall(L, 2, 0, errFunc);
+                if (error != 0)
+                    luaEnv.ThrowExceptionFromError(oldTop);
+                LuaAPI.lua_settop(L, oldTop);
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+        }
+
+        public TResult CallR<T1, T2, TResult>(T1 a1, T2 a2)
+        {
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                var L = luaEnv.L;
+                var translator = luaEnv.translator;
+                int oldTop = LuaAPI.lua_gettop(L);
+                int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+                LuaAPI.lua_getref(L, luaReference);
+                translator.PushByType(L, a1);
+                translator.PushByType(L, a2);
+                int error = LuaAPI.lua_pcall(L, 2, 1, errFunc);
+                if (error != 0)
+                    luaEnv.ThrowExceptionFromError(oldTop);
+                TResult ret;
+                try
+                {
+                    translator.Get(L, -1, out ret);
+                }
+                catch (Exception e)
+                {
+                    throw e;
+                }
+                finally
+                {
+                    LuaAPI.lua_settop(L, oldTop);
+                }
+                return ret;
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+        }
+
+        public void Call<T1, T2, T3>(T1 a1, T2 a2, T3 a3)
+        {
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+    #endif
+            var L = luaEnv.L;
+            var translator = luaEnv.translator;
+            int oldTop = LuaAPI.lua_gettop(L);
+            int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+            LuaAPI.lua_getref(L, luaReference);
+            translator.PushByType(L, a1);
+            translator.PushByType(L, a2);
+            translator.PushByType(L, a3);
+            int error = LuaAPI.lua_pcall(L, 3, 0, errFunc);
+            if (error != 0)
+                luaEnv.ThrowExceptionFromError(oldTop);
+            LuaAPI.lua_settop(L, oldTop);
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            }
+    #endif
+        }
+
+        public TResult CallR<T1, T2, T3, TResult>(T1 a1, T2 a2, T3 a3)
+        {
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+    #endif
+            var L = luaEnv.L;
+            var translator = luaEnv.translator;
+            int oldTop = LuaAPI.lua_gettop(L);
+            int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+            LuaAPI.lua_getref(L, luaReference);
+            translator.PushByType(L, a1);
+            translator.PushByType(L, a2);
+            translator.PushByType(L, a3);
+            int error = LuaAPI.lua_pcall(L, 3, 1, errFunc);
+            if (error != 0)
+                luaEnv.ThrowExceptionFromError(oldTop);
+            TResult ret;
+            try
+            {
+                translator.Get(L, -1, out ret);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                LuaAPI.lua_settop(L, oldTop);
+            }
+            return ret;
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            }
+    #endif
+        }
+
+        public void Call<T1, T2, T3, T4>(T1 a1, T2 a2, T3 a3, T4 a4)
+        {
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+    #endif
+            var L = luaEnv.L;
+            var translator = luaEnv.translator;
+            int oldTop = LuaAPI.lua_gettop(L);
+            int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+            LuaAPI.lua_getref(L, luaReference);
+            translator.PushByType(L, a1);
+            translator.PushByType(L, a2);
+            translator.PushByType(L, a3);
+            translator.PushByType(L, a4);
+            int error = LuaAPI.lua_pcall(L, 4, 0, errFunc);
+            if (error != 0)
+                luaEnv.ThrowExceptionFromError(oldTop);
+            LuaAPI.lua_settop(L, oldTop);
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            }
+    #endif
+        }
+
+        public TResult CallR<T1, T2, T3, T4, TResult>(T1 a1, T2 a2, T3 a3, T4 a4)
+        {
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+    #endif
+            var L = luaEnv.L;
+            var translator = luaEnv.translator;
+            int oldTop = LuaAPI.lua_gettop(L);
+            int errFunc = LuaAPI.load_error_func(L, luaEnv.errorFuncRef);
+            LuaAPI.lua_getref(L, luaReference);
+            translator.PushByType(L, a1);
+            translator.PushByType(L, a2);
+            translator.PushByType(L, a3);
+            translator.PushByType(L, a4);
+            int error = LuaAPI.lua_pcall(L, 4, 1, errFunc);
+            if (error != 0)
+                luaEnv.ThrowExceptionFromError(oldTop);
+            TResult ret;
+            try
+            {
+                translator.Get(L, -1, out ret);
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                LuaAPI.lua_settop(L, oldTop);
+            }
+            return ret;
+    #if THREAD_SAFE || HOTFIX_ENABLE
+            }
+    #endif
         }
 
         public void SetEnv(LuaTable env)

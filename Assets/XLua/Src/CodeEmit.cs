@@ -12,6 +12,8 @@ using System.Reflection.Emit;
 using System.Reflection;
 using System;
 using System.Linq;
+using UnityEditor;
+
 
 #if USE_UNI_LUA
 using LuaAPI = UniLua.Lua;
@@ -23,6 +25,8 @@ using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
 
+using System.Collections.Immutable;
+
 namespace XLua
 {
     public class CodeEmit
@@ -31,7 +35,7 @@ namespace XLua
         private ulong genID = 0;
 
         private MethodInfo LuaEnv_ThrowExceptionFromError = typeof(LuaEnv).GetMethod("ThrowExceptionFromError");
-        private FieldInfo LuaBase_luaEnv = typeof(LuaBase).GetField("luaEnv", BindingFlags.NonPublic | BindingFlags.Instance);
+        private FieldInfo LuaBase_luaEnv = typeof(LuaBase).GetField("luaEnv", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         private MethodInfo DelegateBridgeBase_errorFuncRef_getter = typeof(LuaBase).GetProperty("_errorFuncRef", BindingFlags.NonPublic | BindingFlags.Instance).GetGetMethod(true);
         private MethodInfo LuaAPI_load_error_func = typeof(LuaAPI).GetMethod("load_error_func");
         private MethodInfo LuaBase_translator_getter  = typeof(LuaBase).GetProperty("_translator", BindingFlags.NonPublic | BindingFlags.Instance).GetGetMethod(true);
@@ -70,7 +74,7 @@ namespace XLua
         private MethodInfo ObjectTranslator_PushDecimal = typeof(ObjectTranslator).GetMethod("PushDecimal");
         private MethodInfo ObjectTranslator_GetDecimal = typeof(ObjectTranslator).GetMethod("GetDecimal");
 
-        private Dictionary<Type, MethodInfo> fixPush;
+        private ImmutableDictionary<Type, MethodInfo> fixPush;
 
         private MethodInfo LuaAPI_xlua_tointeger = typeof(LuaAPI).GetMethod("xlua_tointeger");
         private MethodInfo LuaAPI_lua_tonumber = typeof(LuaAPI).GetMethod("lua_tonumber");
@@ -82,52 +86,50 @@ namespace XLua
         private MethodInfo LuaAPI_lua_touint64 = typeof(LuaAPI).GetMethod("lua_touint64");
         private MethodInfo LuaAPI_lua_toint64 = typeof(LuaAPI).GetMethod("lua_toint64");
 
-        private Dictionary<Type, MethodInfo> typedCaster;
-        private Dictionary<Type, MethodInfo> fixCaster;
+        private ImmutableDictionary<Type, MethodInfo> typedCaster;
+        private ImmutableDictionary<Type, MethodInfo> fixCaster;
 
         public CodeEmit()
         {
-            fixPush = new Dictionary<Type, MethodInfo>()
-            {
-                {typeof(byte), LuaAPI_xlua_pushinteger},
-                {typeof(char), LuaAPI_xlua_pushinteger},
-                {typeof(short), LuaAPI_xlua_pushinteger},
-                {typeof(int), LuaAPI_xlua_pushinteger},
-                {typeof(long), LuaAPI_lua_pushint64},
-                {typeof(sbyte), LuaAPI_xlua_pushinteger},
-                {typeof(float), LuaAPI_lua_pushnumber},
-                {typeof(ushort), LuaAPI_xlua_pushinteger},
-                {typeof(uint), LuaAPI_xlua_pushuint},
-                {typeof(ulong), LuaAPI_lua_pushuint64},
-                {typeof(double), LuaAPI_lua_pushnumber},
-                {typeof(string), LuaAPI_lua_pushstring},
-                {typeof(byte[]), LuaAPI_lua_pushbytes},
-                {typeof(bool), LuaAPI_lua_pushboolean},
-                {typeof(IntPtr), LuaAPI_lua_pushlightuserdata},
-            };
-
-            fixCaster = new Dictionary<Type, MethodInfo>()
-            {
-                {typeof(double), LuaAPI_lua_tonumber},
-                {typeof(string), LuaAPI_lua_tostring},
-                {typeof(bool), LuaAPI_lua_toboolean},
-                {typeof(byte[]), LuaAPI_lua_tobytes},
-                {typeof(IntPtr), LuaAPI_lua_touserdata},
-                {typeof(uint), LuaAPI_xlua_touint},
-                {typeof(ulong), LuaAPI_lua_touint64},
-                {typeof(int), LuaAPI_xlua_tointeger},
-                {typeof(long), LuaAPI_lua_toint64},
-            };
-
-            typedCaster = new Dictionary<Type, MethodInfo>()
-            {
-                {typeof(byte), LuaAPI_xlua_tointeger},
-                {typeof(char), LuaAPI_xlua_tointeger},
-                {typeof(short), LuaAPI_xlua_tointeger},
-                {typeof(sbyte), LuaAPI_xlua_tointeger},
-                {typeof(float), LuaAPI_lua_tonumber},
-                {typeof(ushort), LuaAPI_xlua_tointeger},
-            };
+            var builder = ImmutableDictionary.CreateBuilder<Type, MethodInfo>();
+            builder.Add(typeof(byte), LuaAPI_xlua_pushinteger);
+            builder.Add(typeof(char), LuaAPI_xlua_pushinteger);
+            builder.Add(typeof(short), LuaAPI_xlua_pushinteger);
+            builder.Add(typeof(int), LuaAPI_xlua_pushinteger);
+            builder.Add(typeof(long), LuaAPI_lua_pushint64);
+            builder.Add(typeof(sbyte), LuaAPI_xlua_pushinteger);
+            builder.Add(typeof(float), LuaAPI_lua_pushnumber);
+            builder.Add(typeof(ushort), LuaAPI_xlua_pushinteger);
+            builder.Add(typeof(uint), LuaAPI_xlua_pushuint);
+            builder.Add(typeof(ulong), LuaAPI_lua_pushuint64);
+            builder.Add(typeof(double), LuaAPI_lua_pushnumber);
+            builder.Add(typeof(string), LuaAPI_lua_pushstring);
+            builder.Add(typeof(byte[]), LuaAPI_lua_pushbytes);
+            builder.Add(typeof(bool), LuaAPI_lua_pushboolean);
+            builder.Add(typeof(IntPtr), LuaAPI_lua_pushlightuserdata);
+            fixPush = builder.ToImmutable();
+            
+            builder = ImmutableDictionary.CreateBuilder<Type, MethodInfo>();
+            builder.Add(typeof(double), LuaAPI_lua_tonumber);
+            builder.Add(typeof(string), LuaAPI_lua_tostring);
+            builder.Add(typeof(bool), LuaAPI_lua_toboolean);
+            builder.Add(typeof(byte[]), LuaAPI_lua_tobytes);
+            builder.Add(typeof(IntPtr), LuaAPI_lua_touserdata);
+            builder.Add(typeof(uint), LuaAPI_xlua_touint);
+            builder.Add(typeof(ulong), LuaAPI_lua_touint64);
+            builder.Add(typeof(int), LuaAPI_xlua_tointeger);
+            builder.Add(typeof(long), LuaAPI_lua_toint64);
+            fixCaster = builder.ToImmutable();
+            
+            builder = ImmutableDictionary.CreateBuilder<Type, MethodInfo>();
+            builder.Add(typeof(byte), LuaAPI_xlua_tointeger);
+            builder.Add(typeof(char), LuaAPI_xlua_tointeger);
+            builder.Add(typeof(short), LuaAPI_xlua_tointeger);
+            builder.Add(typeof(sbyte), LuaAPI_xlua_tointeger);
+            builder.Add(typeof(ushort), LuaAPI_xlua_tointeger);
+            builder.Add(typeof(float), LuaAPI_lua_tonumber);
+            builder.Add(typeof(int), LuaAPI_xlua_tointeger);
+            typedCaster = builder.ToImmutable();
 
             initBlackList();
         }

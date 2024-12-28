@@ -16,7 +16,6 @@ using RealStatePtr = System.IntPtr;
 using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 #endif
 
-
 namespace XLua
 {
     using System;
@@ -25,6 +24,9 @@ namespace XLua
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Collections.Immutable;
+    using System.Numerics;
+    using UnityEditor.U2D.Aseprite;
 
     class ReferenceEqualsComparer : IEqualityComparer<object>
     {
@@ -151,7 +153,7 @@ namespace XLua
             else
             {
 #if !GEN_CODE_MINIMIZE && !ENABLE_IL2CPP && (UNITY_EDITOR || XLUA_GENERAL) && !FORCE_REFLECTION && !NET_STANDARD_2_0
-                if (!DelegateBridge.Gen_Flag && !type.IsEnum() && !typeof(Delegate).IsAssignableFrom(type) && Utils.IsPublic(type))
+                if (!DelegateBridge.Gen_Flag && !type.IsEnum() && !TypeAssignableFromCache.IsAssignableFrom(typeof(Delegate), type) && Utils.IsPublic(type))
                 {
                     Type wrap = ce.EmitTypeWrap(type);
                     MethodInfo method = wrap.GetMethod("__Register", BindingFlags.Static | BindingFlags.Public);
@@ -165,12 +167,13 @@ namespace XLua
                 Utils.ReflectionWrap(L, type, privateAccessibleFlags.Contains(type));
 #endif
 #if NOT_GEN_WARNING
-                if (!typeof(Delegate).IsAssignableFrom(type))
+                if (!TypeAssignableFromCache.IsAssignableFrom(typeof(Delegate), type)
+                    && !TypeAssignableFromCache.IsAssignableFrom(typeof(Type), type))        // System.RuntimeType 会报警告.
                 {
 #if !XLUA_GENERAL
-                    UnityEngine.Debug.LogWarning(string.Format("{0} not gen, using reflection instead", type));
+                    UnityEngine.Debug.LogError(string.Format("{0} not gen, using reflection instead", type));
 #else
-                    System.Console.WriteLine(string.Format("Warning: {0} not gen, using reflection instead", type));
+                    System.Console.WriteLine(string.Format("Error: {0} not gen, using reflection instead", type));
 #endif
                 }
 #endif
@@ -314,7 +317,7 @@ namespace XLua
                     for (int i = 0; i < fields.Length; i++)
                     {
                         var field = fields[i];
-                        if (field.IsDefined(typeof(CSharpCallLuaAttribute), false) && (typeof(IEnumerable<Type>)).IsAssignableFrom(field.FieldType))
+                        if (field.IsDefined(typeof(CSharpCallLuaAttribute), false) && TypeAssignableFromCache.IsAssignableFrom(typeof(IEnumerable<Type>), field.FieldType))
                         {
                             cs_call_lua.AddRange(field.GetValue(null) as IEnumerable<Type>);
                         }
@@ -324,14 +327,14 @@ namespace XLua
                     for (int i = 0; i < props.Length; i++)
                     {
                         var prop = props[i];
-                        if (prop.IsDefined(typeof(CSharpCallLuaAttribute), false) && (typeof(IEnumerable<Type>)).IsAssignableFrom(prop.PropertyType))
+                        if (prop.IsDefined(typeof(CSharpCallLuaAttribute), false) && TypeAssignableFromCache.IsAssignableFrom(typeof(IEnumerable<Type>), prop.PropertyType))
                         {
                             cs_call_lua.AddRange(prop.GetValue(null, null) as IEnumerable<Type>);
                         }
                     }
                 }
                 IEnumerable<IGrouping<MethodInfo, Type>> groups = (from type in cs_call_lua
-                              where typeof(Delegate).IsAssignableFrom(type) && type != typeof(Delegate) && type != typeof(MulticastDelegate)
+                              where TypeAssignableFromCache.IsAssignableFrom(typeof(Delegate), type) && type != typeof(Delegate) && type != typeof(MulticastDelegate)
                               where !type.GetMethod("Invoke").GetParameters().Any(paramInfo => paramInfo.ParameterType.IsGenericParameter)
                                select type).GroupBy(t => t.GetMethod("Invoke"), new CompareByArgRet());
 
@@ -832,20 +835,19 @@ namespace XLua
 
         public Type GetTypeOf(RealStatePtr L, int idx)
         {
-            Type type = null;
             int type_id = LuaAPI.xlua_gettypeid(L, idx);
             if (type_id != -1)
-            {
-                typeMap.TryGetValue(type_id, out type);
-            }
-            return type;
+                return typeMap[type_id];   // null if not set
+            return null;
         }
 
         public bool Assignable<T>(RealStatePtr L, int index)
 		{
             return Assignable(L, index, typeof(T));
         }
-
+        
+        
+        
         public bool Assignable(RealStatePtr L, int index, Type type)
         {
             if (LuaAPI.lua_type(L, index) == LuaTypes.LUA_TUSERDATA) // 快路径
@@ -863,14 +865,14 @@ namespace XLua
                     {
                         return !type.IsValueType();
                     }
-                    return type.IsAssignableFrom(obj.GetType());
+                    return TypeAssignableFromCache.IsAssignableFrom(type, obj.GetType());
                 }
 
                 int type_id = LuaAPI.xlua_gettypeid(L, index);
-                Type type_of_struct;
-                if (type_id != -1 && typeMap.TryGetValue(type_id, out type_of_struct)) // is struct
+                if (type_id != -1) // is struct
                 {
-                    return type.IsAssignableFrom(type_of_struct);
+                    Type type_of_struct = typeMap[type_id];
+                    return TypeAssignableFromCache.IsAssignableFrom(type, type_of_struct);
                 }
             }
 
@@ -895,14 +897,16 @@ namespace XLua
                     int type_id = LuaAPI.xlua_gettypeid(L, index);
                     if (type_id != -1 && type_id == decimal_type_id)
                     {
-                        decimal d;
-                        Get(L, index, out d);
+                        Get(L, index, out decimal d);
                         return d;
                     }
-                    Type type_of_struct;
-                    if (type_id != -1 && typeMap.TryGetValue(type_id, out type_of_struct) && type.IsAssignableFrom(type_of_struct) && custom_get_funcs.TryGetValue(type, out get))
+                    if (type_id != -1)
                     {
-                        return get(L, index);
+                        Type type_of_struct = typeMap[type_id];
+                        if (type_of_struct != null && TypeAssignableFromCache.IsAssignableFrom(type, type_of_struct) && custom_get_funcs.TryGetValue(type, out get))
+                        {
+                            return get(L, index);
+                        }
                     }
                 }
                 return (objectCasters.GetCaster(type)(L, index, null));
@@ -1002,7 +1006,8 @@ namespace XLua
         Dictionary<Type, int> typeIdMap = new Dictionary<Type, int>();
 
         //only store the type id to type map for struct
-        Dictionary<int, Type> typeMap = new Dictionary<int, Type>();
+        // default is null for each element
+        Type[] typeMap = new Type[64];
 
         public int GetTypeId(RealStatePtr L, Type type)
         {
@@ -1035,7 +1040,7 @@ namespace XLua
                     if (common_array_meta == -1) throw new Exception("Fatal Exception! Array Metatable not inited!");
                     return common_array_meta;
                 }
-                if (typeof(MulticastDelegate).IsAssignableFrom(type))
+                if (TypeAssignableFromCache.IsAssignableFrom(typeof(MulticastDelegate), type))
                 {
                     if (common_delegate_meta == -1) throw new Exception("Fatal Exception! Delegate Metatable not inited!");
                     TryDelayWrapLoader(L, type);
@@ -1077,7 +1082,7 @@ namespace XLua
                         LuaAPI.lua_pushstdcallcfunction(L, metaFunctions.EnumOrMeta);
                         LuaAPI.lua_rawset(L, -3);
                     }
-                    if (typeof(IEnumerable).IsAssignableFrom(type))
+                    if (TypeAssignableFromCache.IsAssignableFrom(typeof(IEnumerable), type))
                     {
                         LuaAPI.xlua_pushasciistring(L, "__pairs");
                         LuaAPI.lua_getref(L, enumerable_pairs_func);
@@ -1091,7 +1096,7 @@ namespace XLua
 
                     if (type.IsValueType())
                     {
-                        typeMap.Add(type_id, type);
+                        typeMap[type_id] = type;
                     }
 
                     typeIdMap.Add(type, type_id);
@@ -1522,31 +1527,50 @@ namespace XLua
             return custom_push_funcs.ContainsKey(type);
         }
 
-        private Dictionary<Type, Delegate> push_func_with_type = null;
+        private ImmutableDictionary<Type, Delegate> push_func_with_type = null;
         
         bool tryGetPushFuncByType<T>(Type type, out T func) where T : class
         {
             if (push_func_with_type == null)
             {
-                push_func_with_type = new Dictionary<Type, Delegate>()
-                {
-                    {typeof(int),  new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger) },
-                    {typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber) },
-                    {typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring) },
-                    {typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring) },
-                    {typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean) },
-                    {typeof(long), new Action<RealStatePtr, long>(LuaAPI.lua_pushint64) },
-                    {typeof(ulong), new Action<RealStatePtr, ulong>(LuaAPI.lua_pushuint64) },
-                    {typeof(IntPtr), new Action<RealStatePtr, IntPtr>(LuaAPI.lua_pushlightuserdata) },
-                    {typeof(decimal), new Action<RealStatePtr, decimal>(PushDecimal) },
-                    {typeof(byte),  new Action<RealStatePtr, byte>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
-                    {typeof(sbyte),  new Action<RealStatePtr, sbyte>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
-                    {typeof(char),  new Action<RealStatePtr, char>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
-                    {typeof(short),  new Action<RealStatePtr, short>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
-                    {typeof(ushort),  new Action<RealStatePtr, ushort>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
-                    {typeof(uint),  new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint) },
-                    {typeof(float),  new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)) },
-                };
+                var builder = ImmutableDictionary<Type, Delegate>.Empty.ToBuilder();
+                builder.Add(typeof(int), new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger));
+                builder.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
+                builder.Add(typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring));
+                builder.Add(typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring));
+                builder.Add(typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean));
+                builder.Add(typeof(long), new Action<RealStatePtr, long>(LuaAPI.lua_pushint64));
+                builder.Add(typeof(ulong), new Action<RealStatePtr, ulong>(LuaAPI.lua_pushuint64));
+                builder.Add(typeof(IntPtr), new Action<RealStatePtr, IntPtr>(LuaAPI.lua_pushlightuserdata));
+                builder.Add(typeof(decimal), new Action<RealStatePtr, decimal>(PushDecimal));
+                builder.Add(typeof(byte), new Action<RealStatePtr, byte>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                builder.Add(typeof(sbyte), new Action<RealStatePtr, sbyte>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                builder.Add(typeof(char), new Action<RealStatePtr, char>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                builder.Add(typeof(short), new Action<RealStatePtr, short>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                builder.Add(typeof(ushort), new Action<RealStatePtr, ushort>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                builder.Add(typeof(uint), new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint));
+                builder.Add(typeof(float), new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)));
+                push_func_with_type = builder.ToImmutable();
+                    
+                // push_func_with_type = new Dictionary<Type, Delegate>()
+                // {
+                //     {typeof(int),  new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger) },
+                //     {typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber) },
+                //     {typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring) },
+                //     {typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring) },
+                //     {typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean) },
+                //     {typeof(long), new Action<RealStatePtr, long>(LuaAPI.lua_pushint64) },
+                //     {typeof(ulong), new Action<RealStatePtr, ulong>(LuaAPI.lua_pushuint64) },
+                //     {typeof(IntPtr), new Action<RealStatePtr, IntPtr>(LuaAPI.lua_pushlightuserdata) },
+                //     {typeof(decimal), new Action<RealStatePtr, decimal>(PushDecimal) },
+                //     {typeof(byte),  new Action<RealStatePtr, byte>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
+                //     {typeof(sbyte),  new Action<RealStatePtr, sbyte>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
+                //     {typeof(char),  new Action<RealStatePtr, char>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
+                //     {typeof(short),  new Action<RealStatePtr, short>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
+                //     {typeof(ushort),  new Action<RealStatePtr, ushort>((L, v) => LuaAPI.xlua_pushinteger(L, v)) },
+                //     {typeof(uint),  new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint) },
+                //     {typeof(float),  new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)) },
+                // };
             }
 
             Delegate obj;

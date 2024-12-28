@@ -242,7 +242,8 @@ namespace XLua.LuaDLL
 
         [DllImport(LUADLL,CallingConvention = CallingConvention.Cdecl)]
 		public static extern IntPtr lua_tolstring(IntPtr L, int index, out IntPtr strLen);//[-0, +0, m]
-
+        
+        
         public static string lua_tostring(IntPtr L, int index)
 		{
             IntPtr strlen;
@@ -393,6 +394,9 @@ namespace XLua.LuaDLL
             xlua_pushasciistring(L, meta);
 			lua_rawget(L, LuaIndexes.LUA_REGISTRYINDEX);
 		}
+        
+        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
+        public static extern int lua_getmetatable(IntPtr L, int objIndex);
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int xluaL_loadbuffer(IntPtr L, byte[] buff, int size, string name);

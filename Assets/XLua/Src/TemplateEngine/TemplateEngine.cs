@@ -183,14 +183,14 @@ namespace XLua.TemplateEngine
         public static string Execute(LuaFunction compiledTemplate, LuaTable parameters)
         {
             compiledTemplate.SetEnv(parameters);
-            object[] result = compiledTemplate.Call();
+            object[] result = compiledTemplate.CallVariant();
             System.Diagnostics.Debug.Assert(result.Length == 1);
             return result[0].ToString();
         }
 
         public static string Execute(LuaFunction compiledTemplate)
         {
-            object[] result = compiledTemplate.Call();
+            object[] result = compiledTemplate.CallVariant();
             System.Diagnostics.Debug.Assert(result.Length == 1);
             return result[0].ToString();
         }

@@ -105,8 +105,14 @@ namespace XLua
                    select type;
         }
 #else
+		static WeakReference<List<Type>> typeCacheRef;
+		static WeakReference<List<Type>> typeCacheNoGenericRef;
+		
 		public static List<Type> GetAllTypes(bool exclude_generic_definition = true)
 		{
+			if(!exclude_generic_definition && typeCacheRef != null && typeCacheRef.TryGetTarget(out var typeCache)) return typeCache;
+			if(exclude_generic_definition && typeCacheNoGenericRef != null && typeCacheNoGenericRef.TryGetTarget(out var typeCacheNoGeneric)) return typeCacheNoGeneric;
+			
 			List<Type> allTypes = new List<Type>();
 			var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 			for (int i = 0; i < assemblies.Length; i++)
@@ -128,6 +134,9 @@ namespace XLua
 				{
 				}
 			}
+			
+			if(exclude_generic_definition) typeCacheNoGenericRef = new WeakReference<List<Type>>(allTypes);
+			else typeCacheRef = new WeakReference<List<Type>>(allTypes);
 
 			return allTypes;
 		}

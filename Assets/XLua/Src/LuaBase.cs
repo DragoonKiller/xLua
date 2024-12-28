@@ -24,7 +24,7 @@ namespace XLua
     {
         protected bool disposed;
         protected readonly int luaReference;
-        protected readonly LuaEnv luaEnv;
+        public readonly LuaEnv luaEnv;
 
 #if UNITY_EDITOR || XLUA_GENERAL
         protected int _errorFuncRef { get { return luaEnv.errorFuncRef; } }

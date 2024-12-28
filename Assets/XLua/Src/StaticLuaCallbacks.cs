@@ -19,8 +19,10 @@ using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 namespace XLua
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using UnityEngine;
 
     public partial class StaticLuaCallbacks
     {
@@ -103,6 +105,12 @@ namespace XLua
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         static int FixCSFunction(RealStatePtr L)
         {
+            if(Application.isPlaying)
+            {
+                LuaAPI.luaL_error(L, "call methods with reflection is prohibited.");
+                return 0;
+            }
+            
             try
             {
                 ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
