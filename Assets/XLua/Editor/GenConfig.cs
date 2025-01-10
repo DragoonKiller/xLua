@@ -34,12 +34,14 @@ public static class GenConfig
                 typeof(LuaCSUtils),
                 typeof(LuaCSMath),
                 typeof(LuaCSCallback),
+                typeof(LuaCSData),
                 typeof(LuaVM),
                 typeof(_Lua_Localization),
-                typeof(_Lua_RangeIndicator),
                 typeof(LuaCSTimer),
                 typeof(_Lua_DenfenceGrid),
-                typeof(_Lua_PathProvider)
+                typeof(_Lua_PathProvider),
+                typeof(_Lua_FireControl),
+                typeof(_Lua_Physics)
             };
 
     //C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface

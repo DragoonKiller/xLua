@@ -270,11 +270,11 @@ namespace XLua
                 float[] array = obj as float[];
                 LuaAPI.lua_pushnumber(L, array[index]);
             }
-            else if (type == typeof(double[]))
-            {
-                double[] array = obj as double[];
-                LuaAPI.lua_pushnumber(L, array[index]);
-            }
+            // else if (type == typeof(double[]))
+            // {
+            //     double[] array = obj as double[];
+            //     LuaAPI.lua_pushnumber(L, array[index]);
+            // }
             else if (type == typeof(bool[]))
             {
                 bool[] array = obj as bool[];

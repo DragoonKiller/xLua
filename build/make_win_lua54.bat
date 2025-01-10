@@ -1,3 +1,14 @@
+@echo off
+setlocal
+
+rem Change to the directory where the script is located
+cd /d %~dp0
+
+rem Loop through and delete all directories starting with "build"
+for /d %%F in (build*) do (
+    echo Deleting folder: %%F
+    rd /s /q "%%F"
+)
 
 set "__VS=Visual Studio 16 2019"
 set "__VSWhere=%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
@@ -22,14 +33,14 @@ if "%__VSVER%" neq "" (
 mkdir build64_54 & pushd build64_54
 cmake -DLUA_VERSION=5.4.1 -G "%__VS%" -A x64  ..
 popd
-cmake --build build64_54 --config Release
+cmake --build build64_54 -j32 --config Release
 md plugin_lua54\Plugins\x86_64
 copy /Y build64_54\Release\xlua.dll plugin_lua54\Plugins\x86_64\xlua.dll
 
 mkdir build32_54 & pushd build32_54
 cmake -DLUA_VERSION=5.4.1 -G "%__VS%" -A Win32 ..
 popd
-cmake --build build32_54 --config Release
+cmake --build build32_54 -j32 --config Release
 md plugin_lua54\Plugins\x86
 copy /Y build32_54\Release\xlua.dll plugin_lua54\Plugins\x86\xlua.dll
 

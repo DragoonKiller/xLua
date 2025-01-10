@@ -226,7 +226,7 @@ namespace XLua.LuaDLL
         public static extern int lua_pcall(IntPtr L, int nArgs, int nResults, int errfunc);
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern double lua_tonumber(IntPtr L, int index);
+        public static extern float lua_tonumber(IntPtr L, int index);
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int xlua_tointeger(IntPtr L, int index);
@@ -278,7 +278,7 @@ namespace XLua.LuaDLL
 		public static extern IntPtr lua_atpanic(IntPtr L, lua_CSFunction panicf);
 
 		[DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
-		public static extern void lua_pushnumber(IntPtr L, double number);
+		public static extern void lua_pushnumber(IntPtr L, float number);
 
 		[DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
 		public static extern void lua_pushboolean(IntPtr L, bool value);
@@ -479,7 +479,7 @@ namespace XLua.LuaDLL
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern long lua_toint64(IntPtr L, int idx);
-
+        
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern ulong lua_touint64(IntPtr L, int idx);
 

@@ -707,7 +707,7 @@ static int math_log10 (lua_State *L) {
 // ================================================================================================
 
 static lua_Number frac(lua_Number t) {
-  return t - floor(t);
+  return t - l_mathop(floor)(t);
 }
 
 static lua_Number lerp(lua_Number t, lua_Number a, lua_Number b) {
@@ -756,13 +756,13 @@ static int math_remap(lua_State *L) {
 
 static int math_sign(lua_State *L) {
   lua_Number x = luaL_checknumber(L, 1);
-  lua_pushnumber(L, (x > 0) ? 1 : (x < 0) ? -1 : 0);
+  lua_pushinteger(L, (x > 0) ? 1 : (x < 0) ? -1 : 0);
   return 1;
 }
 
 static int math_round(lua_State *L) {
   lua_Number x = luaL_checknumber(L, 1);
-  lua_pushinteger(L, (lua_Integer)(x + ((x < 0) ? -0.5 : 0.5)));
+  lua_pushinteger(L, (lua_Integer)(x + ((x < 0) ? -0.5f : 0.5f)));
   return 1;
 }
 
@@ -788,20 +788,20 @@ static int math_moveto(lua_State *L) {
 
 
 static int math_anglemoveto(lua_State *L) {
-    double v = luaL_checknumber(L, 1);
-    double to = luaL_checknumber(L, 2);
-    double maxDelta = luaL_checknumber(L, 3);
+    lua_Number v = luaL_checknumber(L, 1);
+    lua_Number to = luaL_checknumber(L, 2);
+    lua_Number maxDelta = luaL_checknumber(L, 3);
 
-    double to1 = fmod(to, 360.0);
-    double to2 = to1 - 360.0;
-    double to3 = to1 + 360.0;
-    v = fmod(v, 360.0);
+    lua_Number to1 = l_mathop(fmod)(to, 360.0f);
+    lua_Number to2 = to1 - 360.0f;
+    lua_Number to3 = to1 + 360.0f;
+    v = l_mathop(fmod)(v, 360.0f);
 
-    double d1 = fabs(v - to1);
-    double d2 = fabs(v - to2);
-    double d3 = fabs(v - to3);
+    lua_Number d1 = l_mathop(fabs)(v - to1);
+    lua_Number d2 = l_mathop(fabs)(v - to2);
+    lua_Number d3 = l_mathop(fabs)(v - to3);
 
-    double result;
+    lua_Number result;
     if (d1 < d2 && d1 < d3) {
         result = moveto(v, to1, maxDelta);
     } else if (d2 < d3) {
@@ -818,21 +818,21 @@ static int math_angle(lua_State *L) {
   
     // Get dir.x
     lua_getfield(L, 1, "x");
-    double x = luaL_checknumber(L, -1);
+    lua_Number x = luaL_checknumber(L, -1);
     lua_pop(L, 1);
 
     // Get dir.y
     lua_getfield(L, 1, "y");
-    double y = luaL_checknumber(L, -1);
+    lua_Number y = luaL_checknumber(L, -1);
     lua_pop(L, 1);
 
     // Calculate the angle
-    double rad = atan2(y, x);       // atan2 gives the angle in radians
-    double angle = rad * (180.0 / PI); // Convert radians to degrees
+    lua_Number rad = l_mathop(atan2)(y, x);       // atan2 gives the angle in radians
+    lua_Number angle = rad * (180.0f / PI); // Convert radians to degrees
 
     // Adjust to range [0, 360)
     if (angle < 0) {
-        angle += 360.0;
+        angle += 360.0f;
     }
 
     // Push the result
@@ -857,12 +857,12 @@ static int math_inrangex(lua_State *L) {
 }
 
 static int math_angleInRange(lua_State *L) {
-    double angle = luaL_checknumber(L, 1);
-    double min = luaL_checknumber(L, 2);
-    double max = luaL_checknumber(L, 3);
-    angle = fmod(angle, 360.0);
-    min = fmod(min, 360.0);
-    max = fmod(max, 360.0);
+    lua_Number angle = luaL_checknumber(L, 1);
+    lua_Number min = luaL_checknumber(L, 2);
+    lua_Number max = luaL_checknumber(L, 3);
+    angle = l_mathop(fmod)(angle, 360.0f);
+    min = l_mathop(fmod)(min, 360.0f);
+    max = l_mathop(fmod)(max, 360.0f);
     if (min < max) {
         lua_pushboolean(L, angle >= min && angle <= max);
     } else {
@@ -877,14 +877,14 @@ static int math_pingpong(lua_State *L) {
   lua_Number p = luaL_checknumber(L, 2);
   // value range in [0, 1]
   if(lua_gettop(L) == 2) {
-    lua_pushnumber(L, 1 - fabs(2 * frac(t / p / 2) - 1));
+    lua_pushnumber(L, 1 - l_mathop(fabs)(2 * frac(t / p / 2) - 1));
     return 1;
   }
   // value range in [min, max]
   if(lua_gettop(L) == 4) {
     lua_Number min = luaL_checknumber(L, 3);
     lua_Number max = luaL_checknumber(L, 4);
-    lua_pushnumber(L, lerp(1 - fabs(2 * frac(t / p / 2) - 1), min, max));
+    lua_pushnumber(L, lerp(1 - l_mathop(fabs)(2 * frac(t / p / 2) - 1), min, max));
     return 1;
   }
   return 0;

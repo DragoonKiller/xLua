@@ -71,7 +71,7 @@
 #if !defined(WINAPI_FAMILY_PARTITION)
 #define LUA_DL_DLL	/* enable support for DLL */
 #endif
-#define LUA_USE_C89	/* broadly, Windows is C89 */
+#define LUA_USE_C99	/* broadly, Windows is C89. karatoga: modify to C99, this is historical problem... */
 #endif
 
 
@@ -163,11 +163,13 @@
 ** default configuration for 64-bit Lua ('long long' and 'double')
 */
 #if !defined(LUA_INT_TYPE)
-#define LUA_INT_TYPE	LUA_INT_LONGLONG
+// #define LUA_INT_TYPE	LUA_INT_LONGLONG
+#define LUA_INT_TYPE LUA_INT_LONGLONG
 #endif
 
 #if !defined(LUA_FLOAT_TYPE)
-#define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
+// #define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
+#define LUA_FLOAT_TYPE LUA_FLOAT_FLOAT
 #endif
 
 /* }================================================================== */

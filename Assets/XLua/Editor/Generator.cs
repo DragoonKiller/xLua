@@ -1576,7 +1576,7 @@ namespace CSObjectWrapEditor
                 method.Invoke(null, new object[] { });
             }
         }
-
+        
         [MenuItem("XLua/Generate Code", false, 1)]
         public static void GenAll()
         {
@@ -1588,6 +1588,7 @@ namespace CSObjectWrapEditor
             }
 #endif
             var start = DateTime.Now;
+            ObjectTranslator.disableGenWarning = true;
             Directory.CreateDirectory(GeneratorConfig.common_path);
             GetGenConfig(XLua.Utils.GetAllTypes());
             luaenv.DoString("require 'TemplateCommon'");
@@ -1600,6 +1601,7 @@ namespace CSObjectWrapEditor
             GenCodeForClass();
             GenLuaRegister();
             callCustomGen();
+            ObjectTranslator.disableGenWarning = false;
             Debug.Log("finished! use " + (DateTime.Now - start).TotalMilliseconds + " ms");
             AssetDatabase.Refresh();
         }

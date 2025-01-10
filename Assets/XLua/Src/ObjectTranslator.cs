@@ -106,6 +106,8 @@ namespace XLua
 
     public partial class ObjectTranslator
 	{
+        public static bool disableGenWarning = false;
+        
         internal MethodWrapsCache methodWrapsCache;
         internal ObjectCheckers objectCheckers;
         internal ObjectCasters objectCasters;
@@ -166,8 +168,10 @@ namespace XLua
 #else
                 Utils.ReflectionWrap(L, type, privateAccessibleFlags.Contains(type));
 #endif
+
 #if NOT_GEN_WARNING
-                if (!TypeAssignableFromCache.IsAssignableFrom(typeof(Delegate), type)
+                if (!disableGenWarning
+                    && !TypeAssignableFromCache.IsAssignableFrom(typeof(Delegate), type)
                     && !TypeAssignableFromCache.IsAssignableFrom(typeof(Type), type))        // System.RuntimeType 会报警告.
                 {
 #if !XLUA_GENERAL
@@ -1119,7 +1123,7 @@ namespace XLua
             }
             else if (o is float || o is double)
             {
-                double d = Convert.ToDouble(o);
+                var d = (float)o;
                 LuaAPI.lua_pushnumber(L, d);
             }
             else if (o is IntPtr)
@@ -1535,7 +1539,7 @@ namespace XLua
             {
                 var builder = ImmutableDictionary<Type, Delegate>.Empty.ToBuilder();
                 builder.Add(typeof(int), new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger));
-                builder.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
+                // builder.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
                 builder.Add(typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring));
                 builder.Add(typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring));
                 builder.Add(typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean));
@@ -1595,7 +1599,7 @@ namespace XLua
                 get_func_with_type = new Dictionary<Type, Delegate>()
                 {
                     {typeof(int), new Func<RealStatePtr, int, int>(LuaAPI.xlua_tointeger) },
-                    {typeof(double), new Func<RealStatePtr, int, double>(LuaAPI.lua_tonumber) },
+                    // {typeof(double), new Func<RealStatePtr, int, double>(LuaAPI.lua_tonumber) },
                     {typeof(string), new Func<RealStatePtr, int, string>(LuaAPI.lua_tostring) },
                     {typeof(byte[]), new Func<RealStatePtr, int, byte[]>(LuaAPI.lua_tobytes) },
                     {typeof(bool), new Func<RealStatePtr, int, bool>(LuaAPI.lua_toboolean) },
