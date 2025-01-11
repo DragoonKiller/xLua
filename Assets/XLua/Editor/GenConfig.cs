@@ -41,7 +41,9 @@ public static class GenConfig
                 typeof(_Lua_DenfenceGrid),
                 typeof(_Lua_PathProvider),
                 typeof(_Lua_FireControl),
-                typeof(_Lua_Physics)
+                typeof(_Lua_Physics),
+                typeof(_Lua_Movement),
+                typeof(_Lua_StringCache),
             };
 
     //C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface

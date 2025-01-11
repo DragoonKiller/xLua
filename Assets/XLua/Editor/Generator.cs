@@ -115,31 +115,29 @@ namespace CSObjectWrapEditor
         {
 #if !XLUA_GENERAL
             TemplateRef template_ref = ScriptableObject.CreateInstance<TemplateRef>();
-
-            templateRef = new XLuaTemplates()
-            {
+            
+            templateRef = new XLuaTemplates();
 #if GEN_CODE_MINIMIZE
-                LuaClassWrap = { name = template_ref.LuaClassWrapGCM.name, text = template_ref.LuaClassWrapGCM.text },
+            templateRef.LuaClassWrap = { name = template_ref.LuaClassWrapGCM.name, text = template_ref.LuaClassWrapGCM.text },
 #else
-                LuaClassWrap = { name = template_ref.LuaClassWrap.name, text = template_ref.LuaClassWrap.text },
+            templateRef.LuaClassWrap = new XLuaTemplate { name = template_ref.LuaClassWrap.name, text = template_ref.LuaClassWrap.text };
 #endif
-                LuaDelegateBridge = { name = template_ref.LuaDelegateBridge.name, text = template_ref.LuaDelegateBridge.text },
-                LuaDelegateWrap = { name = template_ref.LuaDelegateWrap.name, text = template_ref.LuaDelegateWrap.text },
+            templateRef.LuaDelegateBridge = new XLuaTemplate { name = template_ref.LuaDelegateBridge.name, text = template_ref.LuaDelegateBridge.text };
+            templateRef.LuaDelegateWrap = new XLuaTemplate { name = template_ref.LuaDelegateWrap.name, text = template_ref.LuaDelegateWrap.text };
 #if GEN_CODE_MINIMIZE
-                LuaEnumWrap = { name = template_ref.LuaEnumWrapGCM.name, text = template_ref.LuaEnumWrapGCM.text },
+            templateRef.LuaEnumWrap = new XLuaTemplate { name = template_ref.LuaEnumWrapGCM.name, text = template_ref.LuaEnumWrapGCM.text };
 #else
-                LuaEnumWrap = { name = template_ref.LuaEnumWrap.name, text = template_ref.LuaEnumWrap.text },
+            templateRef.LuaEnumWrap = new XLuaTemplate { name = template_ref.LuaEnumWrap.name, text = template_ref.LuaEnumWrap.text };
 #endif
-                LuaInterfaceBridge = { name = template_ref.LuaInterfaceBridge.name, text = template_ref.LuaInterfaceBridge.text },
+            templateRef.LuaInterfaceBridge = new XLuaTemplate { name = template_ref.LuaInterfaceBridge.name, text = template_ref.LuaInterfaceBridge.text };
 #if GEN_CODE_MINIMIZE
-                LuaRegister = { name = template_ref.LuaRegisterGCM.name, text = template_ref.LuaRegisterGCM.text },
+            templateRef.LuaRegister = new XLuaTemplate { name = template_ref.LuaRegisterGCM.name, text = template_ref.LuaRegisterGCM.text };
 #else
-                LuaRegister = { name = template_ref.LuaRegister.name, text = template_ref.LuaRegister.text },
+            templateRef.LuaRegister = new XLuaTemplate { name = template_ref.LuaRegister.name, text = template_ref.LuaRegister.text };
 #endif
-                LuaWrapPusher = { name = template_ref.LuaWrapPusher.name, text = template_ref.LuaWrapPusher.text },
-                PackUnpack = { name = template_ref.PackUnpack.name, text = template_ref.PackUnpack.text },
-                TemplateCommon = { name = template_ref.TemplateCommon.name, text = template_ref.TemplateCommon.text },
-            };
+            templateRef.LuaWrapPusher = new XLuaTemplate { name = template_ref.LuaWrapPusher.name, text = template_ref.LuaWrapPusher.text };
+            templateRef.PackUnpack = new XLuaTemplate { name = template_ref.PackUnpack.name, text = template_ref.PackUnpack.text };
+            templateRef.TemplateCommon = new XLuaTemplate { name = template_ref.TemplateCommon.name, text = template_ref.TemplateCommon.text };
 #endif
             luaenv.AddLoader((ref string filepath) =>
             {
