@@ -5,6 +5,8 @@ using XLua;
 using System.Linq;
 using System.Reflection;
 using CSObjectWrapEditor;
+using Prota;
+using System.Collections;
 
 public static class GenConfig
 {
@@ -44,6 +46,7 @@ public static class GenConfig
                 typeof(_Lua_Physics),
                 typeof(_Lua_Movement),
                 typeof(_Lua_StringCache),
+                typeof(_Lua_Range),
             };
 
     //C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface
@@ -56,13 +59,26 @@ public static class GenConfig
     [BlackList]
     public static List<List<string>> BlackList = new List<List<string>>()  {
             new List<string>(){"UnityEngine.WWW", "movie"},
-            new List<string>(){"LuaCSTimer+Timer", "LuaCSTimer+TimerQueue"}
+            new List<string>(){"LuaCSTimer+Timer", "LuaCSTimer+TimerQueue"},
         };
     
     public static List<Type> BlackGenericTypeList = new List<Type>()
     {
         typeof(Span<>),
         typeof(ReadOnlySpan<>),
+        typeof(List<>),
+        typeof(HashSet<>),
+        typeof(Dictionary<,>),
+        typeof(Queue<>),
+        typeof(Stack<>),
+        typeof(LinkedList<>),
+        typeof(SortedSet<>),
+        typeof(SortedList<,>),
+        typeof(HashMapArray<,>),
+        typeof(HashMapList<,>),
+        typeof(HashMapSet<,>),
+        typeof(ArrayList),
+        typeof(ArrayLinkedList<>),
     };
 
     private static bool IsBlacklistedGenericType(Type type)
@@ -76,7 +92,8 @@ public static class GenConfig
         switch (memberInfo)
         {
             case PropertyInfo propertyInfo:
-                return IsBlacklistedGenericType(propertyInfo.PropertyType);
+                // return IsBlacklistedGenericType(propertyInfo.PropertyType);
+                return false;
 
             case ConstructorInfo constructorInfo:
                 return constructorInfo.GetParameters().Any(p => IsBlacklistedGenericType(p.ParameterType));

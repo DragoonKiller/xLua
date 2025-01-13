@@ -1602,6 +1602,8 @@ namespace CSObjectWrapEditor
             ObjectTranslator.disableGenWarning = false;
             Debug.Log("finished! use " + (DateTime.Now - start).TotalMilliseconds + " ms");
             AssetDatabase.Refresh();
+            
+            EmmyTypeGenerator.Generator.GenerateEmmyTypeFiles();
         }
 
 #if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
