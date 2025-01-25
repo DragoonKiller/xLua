@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine.Profiling;
 
 namespace CSObjectWrapEditor
 {
@@ -253,6 +254,7 @@ namespace CSObjectWrapEditor
 
         static void getClassInfo(Type type, LuaTable parameters)
         {
+            Profiler.BeginSample("XLua.Generator.getClassInfo of " + type.Name);
             parameters.Set("type", type);
 
             var constructors = new List<MethodBase>();
@@ -299,10 +301,9 @@ namespace CSObjectWrapEditor
             }
             parameters.Set("namespaces", extension_methods_namespace.Distinct().ToList());
 
-            List<LazyMemberInfo> lazyMemberInfos = new List<LazyMemberInfo>();
-
             //warnning: filter all method start with "op_"  "add_" "remove_" may  filter some ordinary method
-            parameters.Set("methods", type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
+            var methods = type
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                 .Where(method => !isDefined(method, typeof (ExtensionAttribute)) || method.GetParameters()[0].ParameterType.IsInterface || method.DeclaringType != type)
                 .Where(method => !method.IsSpecialName 
                     || (
@@ -352,47 +353,53 @@ namespace CSObjectWrapEditor
                         Overloads = overloads,
                         DefaultValues = def_vals
                     };
-                }).ToList());
-
-            parameters.Set("getters", type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
-                
+                }).ToList();
+            
+            var getters = type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                 .Where(prop => prop.GetIndexParameters().Length == 0 && prop.CanRead && (prop.GetGetMethod() != null)  && prop.Name != "Item" && !isObsolete(prop) && !isObsolete(prop.GetGetMethod()) && !isMemberInBlackList(prop) && !isMemberInBlackList(prop.GetGetMethod())).Select(prop => new { prop.Name, IsStatic = prop.GetGetMethod().IsStatic, ReadOnly = false, Type = prop.PropertyType })
                 .Concat(
                     type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                     .Where(field => !isObsolete(field) && !isMemberInBlackList(field))
                     .Select(field => new { field.Name, field.IsStatic, ReadOnly = field.IsInitOnly || field.IsLiteral, Type = field.FieldType })
-                ).Where(info => !IsDoNotGen(type, info.Name))/*.Where(getter => !typeof(Delegate).IsAssignableFrom(getter.Type))*/.ToList());
-
-            parameters.Set("setters", type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
+                ).Where(info => !IsDoNotGen(type, info.Name))/*.Where(getter => !typeof(Delegate).IsAssignableFrom(getter.Type))*/.ToList();
+            
+            var setters = type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                 .Where(prop => prop.GetIndexParameters().Length == 0 && prop.CanWrite && (prop.GetSetMethod() != null) && prop.Name != "Item" && !isObsolete(prop) && !isObsolete(prop.GetSetMethod()) && !isMemberInBlackList(prop) && !isMemberInBlackList(prop.GetSetMethod())).Select(prop => new { prop.Name, IsStatic = prop.GetSetMethod().IsStatic, Type = prop.PropertyType, IsProperty = true })
                 .Concat(
                     type.GetFields(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                     .Where(field => !isObsolete(field) && !isMemberInBlackList(field) && !field.IsInitOnly && !field.IsLiteral)
                     .Select(field => new { field.Name, field.IsStatic, Type = field.FieldType, IsProperty = false })
-                ).Where(info => !IsDoNotGen(type, info.Name))/*.Where(setter => !typeof(Delegate).IsAssignableFrom(setter.Type))*/.ToList());
-
-            parameters.Set("operators", type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
+                ).Where(info => !IsDoNotGen(type, info.Name))/*.Where(setter => !typeof(Delegate).IsAssignableFrom(setter.Type))*/.ToList();
+            
+            var operators = type
+                .GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                 .Where(method => OpMethodNames.Contains(method.Name))
-                .GroupBy(method => method.Name, (k, v) => new { Name = k, Overloads = v.Cast<MethodBase>().OrderBy(mb => mb.GetParameters().Length).ToList() }).ToList());
+                .GroupBy(method => method.Name, (k, v) => new { Name = k, Overloads = v.Cast<MethodBase>().OrderBy(mb => mb.GetParameters().Length).ToList() }).ToList();
 
-            var indexers = type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(prop => prop.GetIndexParameters().Length > 0);
-
-            parameters.Set("indexers", indexers.Where(prop => prop.CanRead && (prop.GetGetMethod() != null)).Select(prop => prop.GetGetMethod())
+            var indexers = type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(prop => prop.GetIndexParameters().Length > 0);
+            
+            var indexersAdd = indexers
+                .Where(prop => prop.CanRead && (prop.GetGetMethod() != null)).Select(prop => prop.GetGetMethod())
                 .Where(method => method.GetParameters().Length == 1 && !method.GetParameters()[0].ParameterType.IsAssignableFrom(typeof(string)))
-                .ToList());
+                .ToList();
 
-            parameters.Set("newindexers", indexers.Where(prop => prop.CanWrite && (prop.GetSetMethod() != null)).Select(prop => prop.GetSetMethod())
+            var newIndexers = indexers
+                .Where(prop => prop.CanWrite && (prop.GetSetMethod() != null)).Select(prop => prop.GetSetMethod())
                 .Where(method => method.GetParameters().Length == 2 && !method.GetParameters()[0].ParameterType.IsAssignableFrom(typeof(string)))
-                .ToList());
-
-            parameters.Set("events", type.GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly).Where(e => !isObsolete(e) && !isMemberInBlackList(e))
+                .ToList();
+            
+            var events = type
+                .GetEvents(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly).Where(e => !isObsolete(e) && !isMemberInBlackList(e))
                 .Where(ev=> ev.GetAddMethod() != null || ev.GetRemoveMethod() != null)
                 .Where(ev => !IsDoNotGen(type, ev.Name))
                 .Select(ev => new { IsStatic = ev.GetAddMethod() != null? ev.GetAddMethod().IsStatic: ev.GetRemoveMethod().IsStatic, ev.Name,
                     CanSet = false, CanAdd = ev.GetRemoveMethod() != null, CanRemove = ev.GetRemoveMethod() != null, Type = ev.EventHandlerType})
-                .ToList());
+                .ToList();
             
-            parameters.Set("lazymembers", lazyMemberInfos);
+            List<LazyMemberInfo> lazyMemberInfos = new List<LazyMemberInfo>();
             foreach (var member in type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.IgnoreCase | BindingFlags.DeclaredOnly)
                 .Where(m => IsDoNotGen(type, m.Name))
                 .GroupBy(m=>m.Name).Select(g => g.First())
@@ -468,6 +475,18 @@ namespace CSObjectWrapEditor
                         break;
                 }
             }
+            
+            Profiler.EndSample();
+            
+            parameters.Set("methods", methods);
+            parameters.Set("getters", getters);
+            parameters.Set("setters", setters);
+            parameters.Set("operators", operators);
+            parameters.Set("indexers", indexersAdd);
+            parameters.Set("newindexers", newIndexers);
+            parameters.Set("events", events);
+            parameters.Set("lazymembers", lazyMemberInfos);
+            
         }
 
         class LazyMemberInfo
@@ -1247,13 +1266,13 @@ namespace CSObjectWrapEditor
 #endif
                 if (obj is Type)
                 {
-                    OptimizeCfg.Add(obj as Type, flag);
+                    OptimizeCfg[obj as Type] = flag;
                 }
-                else if (obj is IEnumerable<Type>)
+                else if (obj is IEnumerable<Type> typelist)
                 {
-                    foreach(var type in (obj as IEnumerable<Type>))
+                    foreach(var type in typelist)
                     {
-                        OptimizeCfg.Add(type, flag);
+                        OptimizeCfg[type] = flag;
                     }
                 }
             }
@@ -1603,7 +1622,7 @@ namespace CSObjectWrapEditor
             Debug.Log("finished! use " + (DateTime.Now - start).TotalMilliseconds + " ms");
             AssetDatabase.Refresh();
             
-            EmmyTypeGenerator.Generator.GenerateEmmyTypeFiles();
+            EmmyTypeGenerator.EmmyLuaAnnotationGenerator.GenerateEmmyTypeFiles();
         }
 
 #if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN

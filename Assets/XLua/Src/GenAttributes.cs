@@ -139,11 +139,14 @@ namespace XLua
                     typeof(UnityEngine.Vector2),
                     typeof(UnityEngine.Vector3),
                     typeof(UnityEngine.Vector4),
+                    typeof(UnityEngine.Vector2Int),
+                    typeof(UnityEngine.Vector3Int),
+                    typeof(UnityEngine.Rect),
                     typeof(UnityEngine.Color),
                     typeof(UnityEngine.Quaternion),
                     typeof(UnityEngine.Ray),
-                    typeof(UnityEngine.Bounds),
                     typeof(UnityEngine.Ray2D),
+                    typeof(UnityEngine.Bounds),
                 };
             }
         }

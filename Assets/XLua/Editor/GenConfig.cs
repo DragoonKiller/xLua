@@ -18,6 +18,8 @@ public static class GenConfig
     [LuaCallCSharp]
     public static List<Type> LuaCallCSharp = new List<Type>() {
                 typeof(System.Object),
+                typeof(System.ValueType),
+                typeof(System.Enum),
                 typeof(Vector2),
                 typeof(Vector3),
                 typeof(Vector4),
@@ -32,22 +34,29 @@ public static class GenConfig
                 typeof(Mathf),
                 typeof(KeyCode),
                 typeof(UnityEngine.Input),
-                typeof(LuaCSNode),
-                typeof(LuaCSUtils),
-                typeof(LuaCSMath),
-                typeof(LuaCSCallback),
-                typeof(LuaCSData),
-                typeof(LuaVM),
-                typeof(_Lua_Localization),
-                typeof(LuaCSTimer),
-                typeof(_Lua_DenfenceGrid),
-                typeof(_Lua_PathProvider),
-                typeof(_Lua_FireControl),
-                typeof(_Lua_Physics),
-                typeof(_Lua_Movement),
-                typeof(_Lua_StringCache),
-                typeof(_Lua_Range),
+                typeof(LayerMask),
             };
+
+    [GCOptimize]
+    static List<Type> GCOptimize
+    {
+        get
+        {
+            return new List<Type>() {
+                typeof(Vector2),
+                typeof(Vector3),
+                typeof(Vector4),
+                typeof(Vector2Int),
+                typeof(Vector3Int),
+                typeof(Rect),
+                typeof(Color),
+                typeof(Quaternion),
+                typeof(Ray),
+                typeof(Ray2D),
+                typeof(Bounds),
+            };
+        }
+    }
 
     //C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface
     [CSharpCallLua]
