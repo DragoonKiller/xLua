@@ -23,8 +23,6 @@ public static class GenConfig
                 typeof(Vector2),
                 typeof(Vector3),
                 typeof(Vector4),
-                typeof(Vector2Int),
-                typeof(Vector3Int),
                 typeof(Quaternion),
                 typeof(Color),
                 typeof(Ray),
@@ -46,14 +44,31 @@ public static class GenConfig
                 typeof(Vector2),
                 typeof(Vector3),
                 typeof(Vector4),
-                typeof(Vector2Int),
-                typeof(Vector3Int),
-                typeof(Rect),
                 typeof(Color),
                 typeof(Quaternion),
                 typeof(Ray),
                 typeof(Ray2D),
                 typeof(Bounds),
+                // 这几个的属性是 private, 必须装箱
+                // typeof(Vector2Int),
+                // typeof(Vector3Int),
+                // typeof(Rect),
+            };
+        }
+    }
+    
+    // 这些属性会存放到 Lua 的 user data 中. 否则不装箱的话读不出属性来.
+    
+    [AdditionalProperties]
+    static Dictionary<Type, List<string>> AdditionalProperties
+    {
+        get
+        {
+            return new Dictionary<Type, List<string>>()
+            {
+                { typeof(Ray), new List<string>() { "origin", "direction" } },
+                { typeof(Ray2D), new List<string>() { "origin", "direction" } },
+                { typeof(Bounds), new List<string>() { "center", "extents" } },
             };
         }
     }

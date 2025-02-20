@@ -75,6 +75,45 @@ namespace XLua
 #endif
         }
 
+
+
+        // no boxing version get
+        public bool TryGet<TKey, TValue>(TKey key, out TValue value)
+        {
+#if THREAD_SAFE || HOTFIX_ENABLE
+            lock (luaEnv.luaEnvLock)
+            {
+#endif
+                value = default;
+                
+                var L = luaEnv.L;
+                using var guard = LuaUtils.GuardStack(L);
+                var translator = luaEnv.translator;
+                int oldTop = LuaAPI.lua_gettop(L);
+                LuaAPI.lua_getref(L, luaReference);
+                translator.PushByType(L, key);
+
+                if (0 != LuaAPI.xlua_pgettable(L, -2))
+                {
+                    string err = LuaAPI.lua_tostring(L, -1);
+                    LuaAPI.lua_settop(L, oldTop);
+                    throw new Exception("get field [" + key + "] error:" + err);
+                }
+                
+
+                LuaTypes lua_type = LuaAPI.lua_type(L, -1);
+                Type type_of_value = typeof(TValue);
+                if (lua_type == LuaTypes.LUA_TNIL)
+                    return false;
+                
+                translator.Get(L, -1, out value);
+                return true;
+#if THREAD_SAFE || HOTFIX_ENABLE
+            }
+#endif
+        }
+
+
         // no boxing version get
         public bool ContainsKey<TKey>(TKey key)
         {

@@ -21,6 +21,7 @@ namespace XLua
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     public class LuaEnv : IDisposable
     {
@@ -375,8 +376,15 @@ namespace XLua
                 int oldTop = LuaAPI.lua_gettop(_L);
 
                 LuaAPI.lua_newtable(_L);
-                LuaTable returnVal = (LuaTable)translator.GetObject(_L, -1, typeof(LuaTable));
-
+                // version 1 original
+                // LuaTable returnVal = (LuaTable)translator.GetObject(_L, -1, typeof(LuaTable));
+                
+                // version 2 copied from xlua code
+                int udata = LuaAPI.xlua_tocsobj_safe(L, -1);
+                Debug.Assert(udata == -1);
+                LuaAPI.lua_pushvalue(L, -1);
+                var returnVal = new LuaTable(LuaAPI.luaL_ref(L), translator.luaEnv);
+                
                 LuaAPI.lua_settop(_L, oldTop);
                 return returnVal;
 #if THREAD_SAFE || HOTFIX_ENABLE

@@ -6,7 +6,7 @@
 // desc : output 
 //////////////////////////////////////////////////////////////////////////    
 --]]
-------------------------------------------------------------------------------
+-----------------------------------------------------------
 
 --module(..., package.seeall)
 
@@ -73,7 +73,7 @@ function CmdTestOutPut:new(oo)
     	fmt = { left = "[%-10s]", right = "[%10s]", },
     	label = { run = {label=" RUN", fmt="left",}, ok = {label="OK ",  fmt="right",}, failed = {label="  FAILED",  fmt="left",},
     		passed = {label="  PASSED", fmt="left",},
-    		split = {label="----------", fmt="right",},  
+    		split = {label="--------", fmt="right",},  
     		group = {label="==========", fmt="right",},
     	},
     }
@@ -202,7 +202,7 @@ function CmdTestOutPut.getFMTStr(self, label, addvalue)
 end
 
 
---------------------------------------------------------------------------------
+------------------------------------------------------------
 CAllCaseListOutPut = TestOutPutBase:new()
 function CAllCaseListOutPut:new(oo)
     local o = oo or {}

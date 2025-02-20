@@ -84,7 +84,7 @@ namespace XLua
         LUA_ERRERR = 5,
     }
 
-    sealed class LuaIndexes
+    public sealed class LuaIndexes
     {
         public static int LUA_REGISTRYINDEX
         {
@@ -914,7 +914,7 @@ namespace XLua
                 return (objectCasters.GetCaster(type)(L, index, null));
             }
         }
-
+        
         public void Get<T>(RealStatePtr L, int index, out T v)
         {
             Func<RealStatePtr, int, T> get_func;
@@ -1098,6 +1098,10 @@ namespace XLua
 
                     if (type.IsValueType())
                     {
+                        while(type_id >= typeMap.Length)
+                        {
+                            Array.Resize(ref typeMap, typeMap.Length * 2);
+                        }
                         typeMap[type_id] = type;
                     }
 
@@ -1244,6 +1248,18 @@ namespace XLua
             else
             {
                 o.push(L);
+            }
+        }
+        
+        public void Push(RealStatePtr L, LightLuaTable t)
+        {
+            if (!t.valid)
+            {
+                LuaAPI.lua_pushnil(L);
+            }
+            else
+            {
+                t.push();
             }
         }
 
@@ -1548,6 +1564,9 @@ namespace XLua
                 builder.Add(typeof(ushort), new Action<RealStatePtr, ushort>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
                 builder.Add(typeof(uint), new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint));
                 builder.Add(typeof(float), new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)));
+                builder.Add(typeof(LightLuaTable), new Action<RealStatePtr, LightLuaTable>((L, v) => v.push()));
+                builder.Add(typeof(LuaTable), new Action<RealStatePtr, LuaTable>((L, v) => v.push(L)));
+                builder.Add(typeof(LuaFunction), new Action<RealStatePtr, LuaFunction>((L, v) => v.push(L)));
                 push_func_with_type = builder.ToImmutable();
             }
 
@@ -1592,6 +1611,10 @@ namespace XLua
                     {typeof(ushort), new Func<RealStatePtr, int, ushort>((L, idx) => (ushort)LuaAPI.xlua_tointeger(L, idx) ) },
                     {typeof(uint), new Func<RealStatePtr, int, uint>(LuaAPI.xlua_touint) },
                     {typeof(float), new Func<RealStatePtr, int, float>((L, idx) => (float)LuaAPI.lua_tonumber(L, idx) ) },
+                    {typeof(LightLuaTable), new Func<RealStatePtr, int, LightLuaTable>((L, idx) => {
+                        Debug.Assert(LuaVM.vm.L == L);
+                        return LightLuaTable.FromRef(LuaVM.vm, idx);   // must be current vm.
+                    }) },
                 };
             }
 

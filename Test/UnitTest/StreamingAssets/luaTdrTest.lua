@@ -280,10 +280,10 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
 	print("libtdrlua.bufalloc() ok")
 	print( "pkg = " .. table_to_string(pkg_table))
 	
-	------------------------------------------------------------------------
+	------------------------------------------------------
 	-- API - get_meta
 	-- return value - ret_code, meta/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local ret_code, meta = libtdrlua.get_meta(metalib, "Pkg")
 	if ret_code ~= 0 then
 		print("libtdrlua.get_meta() failed: " .. meta)
@@ -292,10 +292,10 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
     print("libtdrlua.get_meta() ok")
 	
 	pkg_table.head.cmd = cmd
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	-- API - table2buf
 	-- return value - ret_code, used_size/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local ret_code, used_size = libtdrlua.table2buf(meta, pkg_table, buf, buf_size, 0)
 	if ret_code ~= 0 then
 		print("libtdrlua.table2buf() failed: " .. used_size)
@@ -305,10 +305,10 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
 	print("libtdrlua.table2buf() ok, used_size = " .. used_size)
     
 	
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	-- API - buf2str
 	-- return value - ret_code, str/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local ret_code, str = libtdrlua.buf2str(buf, used_size)
 	if ret_code ~= 0 then
 		print("libtdrlua.buf2str() failed: " .. str)
@@ -318,10 +318,10 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
 	print("libtdrlua.buf2str() ok")
 	print("buf2str:" .. str)
 	
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	-- API - buf2table
 	-- return value - ret_code, pkg_table, used_size/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local ret_code, pkg_table2, used_size2 = libtdrlua.buf2table(meta, buf, used_size, 0)
 	if ret_code ~= 0 then
 		print("libtdrlua.buf2table() failed: " .. used_size2)
@@ -334,10 +334,10 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
 	
 	--print(DataDumper(pkg_table2, "pkg2 = "))
     --因为str为空，所以会引起Unity crash
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	-- API - str2table
 	-- return value - ret_code, pkg_table, used_size/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local ret_code, pkg_table3, used_size3 = libtdrlua.str2table(meta, str, 0)
 	if ret_code ~= 0 then
 		print("libtdrlua.str2table() failed: " .. used_size3)
@@ -348,10 +348,10 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
 	print("libtdrlua.str2table() ok, used_size = " .. used_size3)
 	print("str2buf unpack pkg = ", table_to_string(pkg_table2))
 	
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	-- API - buffree
 	-- return value - nil/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local err_msg = libtdrlua.buffree(buf)
 	if err_msg ~= nil then
 		print("libtdrlua.buffree() failed: " .. err_msg)
@@ -359,12 +359,12 @@ function CMyTestCaseLuaTdr.LoadMetalib(self, load_type, file_path, cmd)
 	print("libtdrlua.buffree() ok")
 	ASSERT_EQ(err_msg, nil)
 
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	-- API - free_metalib
 	-- return value - nil/err_msg
 	-- Note: metalib will be automatically released by lua gc. Thus, this
 	--   step is optional.
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local err_msg = libtdrlua.free_metalib(metalib)
 	if err_msg ~= nil then
 		print("libtdrlua.free_metalib() failed: " .. err_msg)
@@ -920,10 +920,10 @@ function CMyTestCaseLuaTdr.CaseGetMeta(self)
 	ASSERT_EQ(ret_code, 0)
     print("libtdrlua.load_metalib ok")
 	
-	------------------------------------------------------------------------
+	------------------------------------------------------
 	-- API - get_meta
 	-- return value - ret_code, meta/err_msg
-	----------------------------------------------------------------------
+	-----------------------------------------------------
 	local ret_code, meta = libtdrlua.get_meta(metalib, "PkgBody")
 	ASSERT_EQ(ret_code, 0)
 

@@ -6,7 +6,7 @@
 // desc : ltest - lua tester 
 //////////////////////////////////////////////////////////////////////////    
 --]]
-------------------------------------------------------------------------------
+-----------------------------------------------------------
 
 --module(..., package.seeall)
 
@@ -466,7 +466,7 @@ end
 
 
 local _oTestMgr = false
---------------------------------------------------------------------------------
+------------------------------------------------------------
 -- for init help function
 function InitLTest(tPara)
 	if not _oTestMgr then _oTestMgr = TestMgr:new() else _oTestMgr:Fini() end
@@ -474,7 +474,7 @@ function InitLTest(tPara)
 	return _oTestMgr
 end
 
--- add all case of suite(oCls) by match ¡®filterCaseName¡¯
+-- add all case of suite(oCls) by match ï¿½ï¿½filterCaseNameï¿½ï¿½
 -- oCls 			: <table>,  for suite class, the mt must is ltest.TestCase
 -- strSuiteName 	: <string>, for suite name
 -- filterCaseName 	: <string>, math case name
@@ -520,7 +520,7 @@ function RunAllTests(oEnv)
 	return _oTestMgr:Run(oEnv)
 end
 
--- return total_suite£¬total_case£¬ total_faild
+-- return total_suiteï¿½ï¿½total_caseï¿½ï¿½ total_faild
 function GetRunStatInfo()
 	if not _oTestMgr then return end	
 	return _oTestMgr:GetStatInfo()

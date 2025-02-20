@@ -64,7 +64,7 @@ function main()
 	--AddLTestSuite(CMyTestCaseLuaTdr:new(), "CMyTestCaseLuaTdr", "Case")
 	RunAllTests(CMyTestEnv:new())
 	
-	print('--------------------------------------------------------')
+	print('------------------------------------------')
 
 	local t = GetRunStatInfo()
 	--print(t.iFailedNum)
