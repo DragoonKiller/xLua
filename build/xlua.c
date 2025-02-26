@@ -1251,6 +1251,11 @@ static int xlua_isstring (lua_State *L) {
   return 1;
 }
 
+static int xlua_isstringstrict (lua_State *L) {
+  lua_pushboolean(L, lua_isstringstrict(L, -1));
+  return 1;
+}
+  
 static int xlua_isfunction (lua_State *L) {
   lua_pushboolean(L, lua_isfunction(L, -1));
   return 1;
@@ -1313,7 +1318,7 @@ static const luaL_Reg karatogalib[] = {
 	{"ID", lua_tbtoptr},
 	{"isinteger", xlua_isinteger},
 	{"isnumber", xlua_isnumber},
-	{"isstring", xlua_isstring},
+	{"isstring", xlua_isstringstrict},
 	{"isfunction", xlua_isfunction},
 	{"istable", xlua_istable},
 	{"isboolean", xlua_isboolean},

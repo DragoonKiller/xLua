@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Rendering;
 using UnityEngine;
 using XLua;
 
@@ -327,8 +328,8 @@ public struct LightLuaTable : IDisposable
     
     public void SetMetaTable(LuaTable t)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
-        if(!t.valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new Exception("table t in setmetatable(t, meta) is invalid");
+        if(!t.valid) throw new Exception("table meta in setmetatable(t, meta) is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         t.push(L);                              // stack: table, table

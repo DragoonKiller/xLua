@@ -294,7 +294,11 @@ LUA_API int lua_isstring (lua_State *L, int idx) {
   return (ttisstring(o) || cvt2str(o));
 }
 
-
+LUA_API int lua_isstringstrict(lua_State *L, int idx) {
+	const TValue *o = index2value(L, idx);
+	return ttisstring(o);
+  }
+  
 LUA_API int lua_isuserdata (lua_State *L, int idx) {
   const TValue *o = index2value(L, idx);
   return (ttisfulluserdata(o) || ttislightuserdata(o));

@@ -302,13 +302,15 @@ namespace XLua.LuaDLL
             else
             {
 #if !THREAD_SAFE && !HOTFIX_ENABLE
-                if (Encoding.UTF8.GetByteCount(str) > InternalGlobals.strBuff.Length)
+                if (Encoding.UTF8.GetByteCount(str) > 1024)
                 {
                     byte[] bytes = Encoding.UTF8.GetBytes(str);
                     xlua_pushlstring(L, bytes, bytes.Length);
                 }
                 else
                 {
+                    if(InternalGlobals.strBuff.Length < 1024)
+                        InternalGlobals.strBuff = new byte[1024];
                     int bytes_len = Encoding.UTF8.GetBytes(str, 0, str.Length, InternalGlobals.strBuff, 0);
                     xlua_pushlstring(L, InternalGlobals.strBuff, bytes_len);
                 }

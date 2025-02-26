@@ -1541,33 +1541,32 @@ namespace XLua
             return custom_push_funcs.ContainsKey(type);
         }
 
-        private ImmutableDictionary<Type, Delegate> push_func_with_type = null;
+        private Dictionary<Type, Delegate> push_func_with_type = null;
         
         bool tryGetPushFuncByType<T>(Type type, out T func) where T : class
         {
             if (push_func_with_type == null)
             {
-                var builder = ImmutableDictionary<Type, Delegate>.Empty.ToBuilder();
-                builder.Add(typeof(int), new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger));
-                // builder.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
-                builder.Add(typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring));
-                builder.Add(typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring));
-                builder.Add(typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean));
-                builder.Add(typeof(long), new Action<RealStatePtr, long>(LuaAPI.lua_pushint64));
-                builder.Add(typeof(ulong), new Action<RealStatePtr, ulong>(LuaAPI.lua_pushuint64));
-                builder.Add(typeof(IntPtr), new Action<RealStatePtr, IntPtr>(LuaAPI.lua_pushlightuserdata));
-                builder.Add(typeof(decimal), new Action<RealStatePtr, decimal>(PushDecimal));
-                builder.Add(typeof(byte), new Action<RealStatePtr, byte>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
-                builder.Add(typeof(sbyte), new Action<RealStatePtr, sbyte>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
-                builder.Add(typeof(char), new Action<RealStatePtr, char>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
-                builder.Add(typeof(short), new Action<RealStatePtr, short>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
-                builder.Add(typeof(ushort), new Action<RealStatePtr, ushort>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
-                builder.Add(typeof(uint), new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint));
-                builder.Add(typeof(float), new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)));
-                builder.Add(typeof(LightLuaTable), new Action<RealStatePtr, LightLuaTable>((L, v) => v.push()));
-                builder.Add(typeof(LuaTable), new Action<RealStatePtr, LuaTable>((L, v) => v.push(L)));
-                builder.Add(typeof(LuaFunction), new Action<RealStatePtr, LuaFunction>((L, v) => v.push(L)));
-                push_func_with_type = builder.ToImmutable();
+                push_func_with_type = new Dictionary<Type, Delegate>();
+                push_func_with_type.Add(typeof(int), new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger));
+                // push_func_with_type.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
+                push_func_with_type.Add(typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring));
+                push_func_with_type.Add(typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring));
+                push_func_with_type.Add(typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean));
+                push_func_with_type.Add(typeof(long), new Action<RealStatePtr, long>(LuaAPI.lua_pushint64));
+                push_func_with_type.Add(typeof(ulong), new Action<RealStatePtr, ulong>(LuaAPI.lua_pushuint64));
+                push_func_with_type.Add(typeof(IntPtr), new Action<RealStatePtr, IntPtr>(LuaAPI.lua_pushlightuserdata));
+                push_func_with_type.Add(typeof(decimal), new Action<RealStatePtr, decimal>(PushDecimal));
+                push_func_with_type.Add(typeof(byte), new Action<RealStatePtr, byte>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                push_func_with_type.Add(typeof(sbyte), new Action<RealStatePtr, sbyte>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                push_func_with_type.Add(typeof(char), new Action<RealStatePtr, char>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                push_func_with_type.Add(typeof(short), new Action<RealStatePtr, short>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                push_func_with_type.Add(typeof(ushort), new Action<RealStatePtr, ushort>((L, v) => LuaAPI.xlua_pushinteger(L, v)));
+                push_func_with_type.Add(typeof(uint), new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint));
+                push_func_with_type.Add(typeof(float), new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)));
+                push_func_with_type.Add(typeof(LightLuaTable), new Action<RealStatePtr, LightLuaTable>((L, v) => v.push()));
+                push_func_with_type.Add(typeof(LuaTable), new Action<RealStatePtr, LuaTable>((L, v) => v.push(L)));
+                push_func_with_type.Add(typeof(LuaFunction), new Action<RealStatePtr, LuaFunction>((L, v) => v.push(L)));
             }
 
             Delegate obj;

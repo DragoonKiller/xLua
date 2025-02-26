@@ -74,7 +74,7 @@ namespace XLua
         private MethodInfo ObjectTranslator_PushDecimal = typeof(ObjectTranslator).GetMethod("PushDecimal");
         private MethodInfo ObjectTranslator_GetDecimal = typeof(ObjectTranslator).GetMethod("GetDecimal");
 
-        private ImmutableDictionary<Type, MethodInfo> fixPush;
+        private IReadOnlyDictionary<Type, MethodInfo> fixPush;
 
         private MethodInfo LuaAPI_xlua_tointeger = typeof(LuaAPI).GetMethod("xlua_tointeger");
         private MethodInfo LuaAPI_lua_tonumber = typeof(LuaAPI).GetMethod("lua_tonumber");
@@ -86,8 +86,8 @@ namespace XLua
         private MethodInfo LuaAPI_lua_touint64 = typeof(LuaAPI).GetMethod("lua_touint64");
         private MethodInfo LuaAPI_lua_toint64 = typeof(LuaAPI).GetMethod("lua_toint64");
 
-        private ImmutableDictionary<Type, MethodInfo> typedCaster;
-        private ImmutableDictionary<Type, MethodInfo> fixCaster;
+        private IReadOnlyDictionary<Type, MethodInfo> typedCaster;
+        private IReadOnlyDictionary<Type, MethodInfo> fixCaster;
 
         public CodeEmit()
         {
