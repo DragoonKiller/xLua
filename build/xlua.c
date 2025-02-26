@@ -1302,6 +1302,35 @@ static int xlua_nullify (lua_State *L) {
   return 1;
 }
 
+
+static int xlua_string_split(lua_State *L) {
+    const char *str = luaL_checkstring(L, 1);
+    const char *delim = luaL_checkstring(L, 2);
+    
+    lua_newtable(L);
+    
+    size_t delim_len = strlen(delim);
+    if (delim_len == 0) {
+        return luaL_error(L, "Delimiter cannot be empty");
+    }
+    
+    int index = 1;
+    const char *start = str;
+    const char *found;
+    
+    while ((found = strstr(start, delim)) != NULL) {
+        lua_pushlstring(L, start, found - start);
+        lua_rawseti(L, -2, index++);
+        start = found + delim_len;
+    }
+    
+    lua_pushstring(L, start);
+    lua_rawseti(L, -2, index);
+    
+    return 1;
+}
+
+
 // ================================================================================================
 // CUstom part end
 // ================================================================================================
@@ -1330,6 +1359,7 @@ static const luaL_Reg karatogalib[] = {
 };
 
 LUA_API void luaopen_xlua(lua_State *L) {
+	
 	luaL_openlibs(L);
 	
 	int i = 0;
@@ -1338,6 +1368,13 @@ LUA_API void luaopen_xlua(lua_State *L) {
 		lua_register(L, karatogalib[i].name, karatogalib[i].func);
 		i++;
 	}
+	
+	int top = lua_gettop(L);
+	lua_getglobal(L, "string");					// stack: string table
+	lua_pushstring(L, "split");					// stack: string table, "split"
+	lua_pushcfunction(L, xlua_string_split);	// stack: string table, "split", xlua_string_split
+	lua_settable(L, -3);						// stack: string table
+	lua_settop(L, top);
 	
 #if LUA_VERSION_NUM >= 503
 	luaL_newlib(L, xlualib);

@@ -1612,7 +1612,10 @@ namespace XLua
                     {typeof(float), new Func<RealStatePtr, int, float>((L, idx) => (float)LuaAPI.lua_tonumber(L, idx) ) },
                     {typeof(LightLuaTable), new Func<RealStatePtr, int, LightLuaTable>((L, idx) => {
                         Debug.Assert(LuaVM.vm.L == L);
-                        return LightLuaTable.FromRef(LuaVM.vm, idx);   // must be current vm.
+                        LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
+                        if(!LuaAPI.lua_istable(L, -1)) return default;              // return a table that is not usable.
+                        var r = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);   // add table to index.
+                        return LightLuaTable.FromRef(LuaVM.vm, r);                  // must be current vm.
                     }) },
                 };
             }
