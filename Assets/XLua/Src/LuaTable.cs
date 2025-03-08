@@ -27,6 +27,18 @@ namespace XLua
     {
         public bool valid => luaEnv.rawL != IntPtr.Zero && luaReference != 0;
         
+        public IntPtr addr
+        {
+            get
+            {
+                var L = luaEnv.L;
+                push(L);
+                IntPtr ret = LuaAPI.lua_topointer(L, -1);
+                LuaAPI.lua_pop(L, 1);
+                return ret;
+            }
+        }
+        
         public LuaTable(int reference, LuaEnv luaenv) : base(reference, luaenv)
         {
         }

@@ -1125,7 +1125,7 @@ namespace XLua
             }
             else if (o is float || o is double)
             {
-                var d = (float)o;
+                double d = Convert.ToDouble(o);
                 LuaAPI.lua_pushnumber(L, d);
             }
             else if (o is IntPtr)
@@ -1549,7 +1549,7 @@ namespace XLua
             {
                 push_func_with_type = new Dictionary<Type, Delegate>();
                 push_func_with_type.Add(typeof(int), new Action<RealStatePtr, int>(LuaAPI.xlua_pushinteger));
-                // push_func_with_type.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
+                push_func_with_type.Add(typeof(double), new Action<RealStatePtr, double>(LuaAPI.lua_pushnumber));
                 push_func_with_type.Add(typeof(string), new Action<RealStatePtr, string>(LuaAPI.lua_pushstring));
                 push_func_with_type.Add(typeof(byte[]), new Action<RealStatePtr, byte[]>(LuaAPI.lua_pushstring));
                 push_func_with_type.Add(typeof(bool), new Action<RealStatePtr, bool>(LuaAPI.lua_pushboolean));
@@ -1591,7 +1591,7 @@ namespace XLua
                 get_func_with_type = new Dictionary<Type, Delegate>()
                 {
                     {typeof(int), new Func<RealStatePtr, int, int>(LuaAPI.xlua_tointeger) },
-                    // {typeof(double), new Func<RealStatePtr, int, double>(LuaAPI.lua_tonumber) },
+                    {typeof(double), new Func<RealStatePtr, int, double>(LuaAPI.lua_tonumber) },
                     {typeof(string), new Func<RealStatePtr, int, string>(LuaAPI.lua_tostring) },
                     {typeof(byte[]), new Func<RealStatePtr, int, byte[]>(LuaAPI.lua_tobytes) },
                     {typeof(bool), new Func<RealStatePtr, int, bool>(LuaAPI.lua_toboolean) },

@@ -257,7 +257,10 @@ function GetCheckStatement(t, idx, is_v_params)
 	elseif testname == "XLua.LuaFunction" then
         return cond_start .. "(LuaAPI.lua_isnil(L, " .. idx .. ") || LuaAPI.lua_type(L, ".. idx ..") == LuaTypes.LUA_TFUNCTION)" .. cond_end
     end
-    return cond_start .. (fixChecker[testname] or ("translator.Assignable<" .. CsFullTypeName(t).. ">")) .. "(L, ".. idx ..")" .. cond_end
+    local u = string.format("%s(L, %d)", fixChecker[testname], idx);
+    local a = string.format("translator.Assignable(L, %d, (%s)default)", idx, CsFullTypeName(t))
+    local select = fixChecker[testname] and u or a
+    return cond_start .. select .. cond_end
 end
 
 local delegateType = typeof(CS.System.Delegate)
