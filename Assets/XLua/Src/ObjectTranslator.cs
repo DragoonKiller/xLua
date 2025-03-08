@@ -26,6 +26,7 @@ namespace XLua
     using System.Collections.Immutable;
     using Prota;
     using UnityEngine;
+    using Unity.Jobs.LowLevel.Unsafe;
 
     class ReferenceEqualsComparer : IEqualityComparer<object>
     {
@@ -924,7 +925,8 @@ namespace XLua
             }
             else
             {
-                v = (T)GetObject(L, index, typeof(T));
+                var obj = GetObject(L, index, typeof(T));
+                v = (T)obj;
             }
         }
         

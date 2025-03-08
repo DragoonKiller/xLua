@@ -32,7 +32,6 @@ public static class GenConfig
                 typeof(Mathf),
                 typeof(KeyCode),
                 typeof(UnityEngine.Input),
-                typeof(LayerMask),
             };
 
     [GCOptimize]
