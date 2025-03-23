@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor.Rendering;
 using UnityEngine;
 using XLua;
@@ -9,6 +10,24 @@ using LuaAPI = XLua.LuaDLL.Lua;
 
 public struct LightLuaTable : IDisposable
 {
+    // static Dictionary<string, int> debugList = new();
+    // string createPlace;
+    // void Record()
+    // {
+    //     if(debugList.ContainsKey(createPlace))
+    //     {
+    //         debugList[createPlace] += 1;
+    //     }
+    //     else
+    //     {
+    //         debugList[createPlace] = 1;
+    //     }
+    // }
+    // void RemoveRecord()
+    // {
+    //     debugList[createPlace] -= 1;
+    // }
+    // 
     public LuaEnv vm { get; private set; }
     public int reference { get; private set; }
     public UnityEngine.Object backref { get; private set; }
@@ -38,6 +57,8 @@ public struct LightLuaTable : IDisposable
         this.reference = reference;
         this.backref = backref;
         _addr = default;
+        // createPlace = System.Environment.StackTrace.ToString();
+        // Record();
     }
     
     LightLuaTable(LuaEnv vm, int reference)
@@ -46,6 +67,8 @@ public struct LightLuaTable : IDisposable
         this.reference = reference;
         this.backref = null;
         _addr = default;
+        // createPlace = System.Environment.StackTrace.ToString();
+        // Record();
     }
     
     public static LightLuaTable FromRef(LuaEnv vm, int reference)
@@ -69,18 +92,27 @@ public struct LightLuaTable : IDisposable
     {
         vm.translator.ReleaseLuaBase(vm.L, reference, false);
         this.reference = 0;
+        // RemoveRecord();
     }
     
-    // ====================================================================================================
-    // ====================================================================================================
+    // public static void LogRecord()
+    // {
+    //     foreach (var item in debugList.OrderBy(a => a.Value))
+    //     {
+    //         Debug.Log($"[{item.Value}]:{item.Key}");
+    //     }
+    // }
     
     public void push() => LuaAPI.lua_getref(vm.L, reference);
+    
+    // ====================================================================================================
+    // ====================================================================================================
     
     #region Set functions
     
     public void SetNil(string key)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -91,7 +123,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(string key, int value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -101,7 +133,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(string key, float value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -111,7 +143,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(string key, string value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -121,7 +153,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(string key, bool value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -131,7 +163,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set<T>(string key, T value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -141,8 +173,8 @@ public struct LightLuaTable : IDisposable
     
     public void Set(string key, LightLuaTable t)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
-        if(!t.valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
+        if(!t.valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -152,8 +184,8 @@ public struct LightLuaTable : IDisposable
     
     public void Set(string key, LuaTable t)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
-        if(!t.valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
+        if(!t.valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
@@ -163,7 +195,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(int key, int value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -173,7 +205,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(int key, float value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -183,7 +215,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(int key, string value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -193,7 +225,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set(int key, bool value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -203,8 +235,8 @@ public struct LightLuaTable : IDisposable
     
     public void Set(int key, LightLuaTable t)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
-        if(!t.valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
+        if(!t.valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -214,8 +246,8 @@ public struct LightLuaTable : IDisposable
     
     public void Set(int key, LuaTable t)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
-        if(!t.valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
+        if(!t.valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -225,7 +257,7 @@ public struct LightLuaTable : IDisposable
     
     public void Set<T>(int key, T value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
@@ -239,7 +271,7 @@ public struct LightLuaTable : IDisposable
     
     public bool Get<T>(string key, out T value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         value = default;
         using var _ = LuaUtils.CallNative(out var L);
         push();                                             // stack: table
@@ -252,7 +284,7 @@ public struct LightLuaTable : IDisposable
     
     public bool Get<T>(int key, out T value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         value = default;
         using var _ = LuaUtils.CallNative(out var L);
         push();                                             // stack: table
@@ -265,7 +297,7 @@ public struct LightLuaTable : IDisposable
     
     public bool Get(object key, out object value)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         value = default;
         using var _ = LuaUtils.CallNative(out var L);
         push();                                             // stack: table
@@ -279,7 +311,7 @@ public struct LightLuaTable : IDisposable
     // this function should be followed by error handler.
     public int GetNative(string key)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         var L = vm.L;
         push();                                             // stack: table
         LuaAPI.lua_pushstring(L, key);                      // stack: table, key
@@ -290,7 +322,7 @@ public struct LightLuaTable : IDisposable
     // this function should be followed by error handler.
     public int GetNative(float key)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         var L = vm.L;
         push();                                             // stack: table
         LuaAPI.lua_pushnumber(L, key);                      // stack: table, key
@@ -301,7 +333,7 @@ public struct LightLuaTable : IDisposable
     // this function should be followed by error handler.
     public int GetNative(int key)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         var L = vm.L;
         push();                                             // stack: table
         LuaAPI.xlua_pushinteger(L, key);                       // stack: table, key
@@ -312,7 +344,7 @@ public struct LightLuaTable : IDisposable
     // this function should be followed by error handler.
     public int GetNative(long key)
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         var L = vm.L;
         push();                                             // stack: table
         LuaAPI.lua_pushint64(L, key);                       // stack: table, key
@@ -334,8 +366,8 @@ public struct LightLuaTable : IDisposable
     
     public void SetMetaTable(LuaTable t)
     {
-        if(!valid) throw new Exception("table t in setmetatable(t, meta) is invalid");
-        if(!t.valid) throw new Exception("table meta in setmetatable(t, meta) is invalid");
+        if(!valid) throw new LuaException("table t in setmetatable(t, meta) is invalid");
+        if(!t.valid) throw new LuaException("table meta in setmetatable(t, meta) is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         t.push(L);                              // stack: table, table
@@ -344,7 +376,7 @@ public struct LightLuaTable : IDisposable
     
     public void ClearTable()
     {
-        if(!valid) throw new Exception("LightLuaTable is invalid");
+        if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
         LuaUtils._clearTableFunc.push(L);               // stack: func
         push();                                         // stack: func, table

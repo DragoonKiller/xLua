@@ -20,7 +20,7 @@ public static class GenConfig
                 typeof(System.Object),
                 typeof(System.ValueType),
                 typeof(System.Enum),
-                typeof(Vector2),
+                // typeof(Vector2),
                 typeof(Vector3),
                 typeof(Vector4),
                 typeof(Quaternion),
@@ -40,7 +40,7 @@ public static class GenConfig
         get
         {
             return new List<Type>() {
-                typeof(Vector2),
+                // typeof(Vector2),
                 typeof(Vector3),
                 typeof(Vector4),
                 typeof(Color),

@@ -921,6 +921,7 @@ namespace CSObjectWrapEditor
             {
                 type_info.Set("purevaluetypes", types
                      .Where(t => t.IsEnum || (!t.IsPrimitive && SizeOf(t) != -1))
+                     .Where(t => t.Name != "Vector2")       // we manually handle Vector2
                      .Select(t => new {
                          Type = t,
                          Size = SizeOf(t),

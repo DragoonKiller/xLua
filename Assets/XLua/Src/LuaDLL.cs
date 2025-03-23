@@ -10,8 +10,12 @@ namespace XLua.LuaDLL
 {
 
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using System.Text;
+    using Prota;
+    using UnityEngine;
     using XLua;
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || XLUA_GENERAL || (UNITY_WSA && !UNITY_EDITOR)
@@ -172,14 +176,6 @@ namespace XLua.LuaDLL
 		}
 
 		[DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
-		public static extern int luaL_ref(IntPtr L, int registryIndex);
-
-        public static int luaL_ref(IntPtr L)//[-1, +0, m]
-        {
-			return luaL_ref(L,LuaIndexes.LUA_REGISTRYINDEX);
-		}
-
-		[DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
 		public static extern void xlua_rawgeti(IntPtr L, int tableIndex, long index);
 
 		[DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
@@ -193,13 +189,35 @@ namespace XLua.LuaDLL
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern int pcall_prepare(IntPtr L, int error_func_ref, int func_ref);
 
+		
+        // ====================================================================================================
+        // ====================================================================================================
+        
+        public static Dictionary<int, string> refs = new();
+        
         [DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
-		public static extern void luaL_unref(IntPtr L, int registryIndex, int reference);
+		static extern int luaL_ref(IntPtr L, int registryIndex);
+        
+        public static int luaL_ref(IntPtr L)//[-1, +0, m]
+        {
+            var res = luaL_ref(L,LuaIndexes.LUA_REGISTRYINDEX);
+            // refs.Add(res, Environment.StackTrace);
+			return res;
+		}
+
+        [DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
+		static extern void luaL_unref(IntPtr L, int registryIndex, int reference);
 
 		public static void lua_unref(IntPtr L, int reference)
 		{
+            UnityEngine.Debug.Assert(reference != 0);
+            // refs.Remove(reference);
 			luaL_unref(L,LuaIndexes.LUA_REGISTRYINDEX,reference);
 		}
+
+        // ====================================================================================================
+        // ====================================================================================================
+
 
 		[DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
 		public static extern bool lua_isstring(IntPtr L, int index);

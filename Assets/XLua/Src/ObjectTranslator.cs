@@ -267,7 +267,7 @@ namespace XLua
             LuaAPI.xlua_pushasciistring(L, "v");
             LuaAPI.lua_rawset(L, -3);
             LuaAPI.lua_setmetatable(L, -2);
-            cacheRef = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+            cacheRef = LuaAPI.luaL_ref(L);
 
             initCSharpCallLua();
         }
@@ -674,7 +674,7 @@ namespace XLua
                 end
             ")[0] as LuaFunction;
             func.push(L);
-            enumerable_pairs_func = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+            enumerable_pairs_func = LuaAPI.luaL_ref(L);
             func.Dispose();
         }
 
@@ -717,9 +717,9 @@ namespace XLua
             LuaAPI.lua_pop(L, 1);
 
             LuaAPI.lua_createtable(L, 1, 4); // 4 for __gc, __tostring, __index, __newindex
-            common_array_meta = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+            common_array_meta = LuaAPI.luaL_ref(L);
             LuaAPI.lua_createtable(L, 1, 4); // 4 for __gc, __tostring, __index, __newindex
-            common_delegate_meta = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+            common_delegate_meta = LuaAPI.luaL_ref(L);
         }
 		
 		internal void createFunctionMetatable(RealStatePtr L)
@@ -733,7 +733,7 @@ namespace XLua
             LuaAPI.lua_rawset(L, -3);
 
             LuaAPI.lua_pushvalue(L, -1);
-            int type_id = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+            int type_id = LuaAPI.luaL_ref(L);
             LuaAPI.lua_pushnumber(L, type_id);
             LuaAPI.xlua_rawseti(L, -2, 1);
             LuaAPI.lua_pop(L, 1);
@@ -1093,7 +1093,7 @@ namespace XLua
                         LuaAPI.lua_rawset(L, -3);
                     }
                     LuaAPI.lua_pushvalue(L, -1);
-                    type_id = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+                    type_id = LuaAPI.luaL_ref(L);
                     LuaAPI.lua_pushnumber(L, type_id);
                     LuaAPI.xlua_rawseti(L, -2, 1);
                     LuaAPI.lua_pop(L, 1);
@@ -1262,6 +1262,18 @@ namespace XLua
             else
             {
                 t.push();
+            }
+        }
+        
+        public void Push(RealStatePtr L, LightLuaFunction f)
+        {
+            if (!f.valid)
+            {
+                LuaAPI.lua_pushnil(L);
+            }
+            else
+            {
+                f.push();
             }
         }
 
@@ -1567,8 +1579,10 @@ namespace XLua
                 push_func_with_type.Add(typeof(uint), new Action<RealStatePtr, uint>(LuaAPI.xlua_pushuint));
                 push_func_with_type.Add(typeof(float), new Action<RealStatePtr, float>((L, v) => LuaAPI.lua_pushnumber(L, v)));
                 push_func_with_type.Add(typeof(LightLuaTable), new Action<RealStatePtr, LightLuaTable>((L, v) => v.push()));
+                push_func_with_type.Add(typeof(LightLuaFunction), new Action<RealStatePtr, LightLuaFunction>((L, v) => v.push()));
                 push_func_with_type.Add(typeof(LuaTable), new Action<RealStatePtr, LuaTable>((L, v) => v.push(L)));
                 push_func_with_type.Add(typeof(LuaFunction), new Action<RealStatePtr, LuaFunction>((L, v) => v.push(L)));
+                push_func_with_type.Add(typeof(Vector2), new Action<RealStatePtr, Vector2>((L, v) => this.Push(L, v)));
             }
 
             Delegate obj;
@@ -1616,8 +1630,19 @@ namespace XLua
                         Debug.Assert(LuaVM.vm.L == L);
                         LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
                         if(!LuaAPI.lua_istable(L, -1)) return default;              // return a table that is not usable.
-                        var r = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);   // add table to index.
+                        var r = LuaAPI.luaL_ref(L);   // add table to index.
                         return LightLuaTable.FromRef(LuaVM.vm, r);                  // must be current vm.
+                    }) },
+                    {typeof(LightLuaFunction), new Func<RealStatePtr, int, LightLuaFunction>((L, idx) => {
+                        Debug.Assert(LuaVM.vm.L == L);
+                        LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
+                        if(!LuaAPI.lua_isfunction(L, -1)) return default;           // return a function that is not usable.
+                        var r = LuaAPI.luaL_ref(L);   // add function to index.
+                        return LightLuaFunction.FromRef(LuaVM.vm, r);               // must be current vm.
+                    }) },
+                    {typeof(Vector2), new Func<RealStatePtr, int, Vector2>((L, v) => {
+                        this.Get(L, v, out Vector2 ret);
+                        return ret;
                     }) },
                 };
             }

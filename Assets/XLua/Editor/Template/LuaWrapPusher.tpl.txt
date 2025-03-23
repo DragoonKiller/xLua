@@ -63,7 +63,7 @@ namespace XLua
 				if (<%=enum_ref_var_name%> == -1)
 				{
 				    Utils.LoadCSTable(L, typeof(<%=full_type_name%>));
-				    <%=enum_ref_var_name%> = LuaAPI.luaL_ref(L, LuaIndexes.LUA_REGISTRYINDEX);
+				    <%=enum_ref_var_name%> = LuaAPI.luaL_ref(L);
 				}
 				<%end%>
             }

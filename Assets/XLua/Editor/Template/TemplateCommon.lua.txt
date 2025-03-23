@@ -320,7 +320,9 @@ function GetCasterStatement(t, idx, var_name, need_declare, is_v_params)
     if is_v_params then
         return statement .. "translator.GetParams<" .. CsFullTypeName(t:GetElementType()).. ">" .. "(L, ".. idx ..")" 
     elseif typedCaster[testname] then
-        return statement .. "(" .. CsFullTypeName(t) .. ")" ..typedCaster[testname] .. "(L, ".. idx ..")" 
+        return statement .. "(" .. CsFullTypeName(t) .. ")" ..typedCaster[testname] .. "(L, ".. idx ..")"
+    elseif CsFullTypeName(t) == "UnityEngine.Vector2" then
+        return string.format("%stranslator.Get(L, %s, out %s)", statement, idx, var_name)
 	elseif IsDelegate(t) then
 	    return statement .. "translator.GetDelegate<" .. CsFullTypeName(t).. ">" .. "(L, ".. idx ..")" 
     elseif fixCaster[testname] then
@@ -369,21 +371,23 @@ local GetNullableUnderlyingType = CS.System.Nullable.GetUnderlyingType
 
 function GetPushStatement(t, variable, is_v_params)
     if is_v_params then
-	    local item_push = GetPushStatement(t:GetElementType(), variable..'[__gen_i]')
-		return 'if ('.. variable ..' != null)  { for (int __gen_i = 0; __gen_i < ' .. variable .. '.Length; ++__gen_i) ' .. item_push .. '; }'
-	end
+        local item_push = GetPushStatement(t:GetElementType(), variable..'[__gen_i]')
+        return string.format('if (%s != null) { for (int __gen_i = 0; __gen_i < %s.Length; ++__gen_i) %s; }', variable, variable, item_push)
+    end
     if t.IsByRef then t = t:GetElementType() end
     local testname = getSafeFullName(t)
     if fixPush[testname] then
-        return fixPush[testname] .. "(L, ".. variable ..")"
+        return string.format('%s(L, %s)', fixPush[testname], variable)
+     elseif CsFullTypeName(t) == "UnityEngine.Vector2" then
+        return string.format('translator.Push(L, %s)', variable)
     elseif genPushAndUpdateTypes[t] then
-        return "translator.Push".. CSVariableName(t) .."(L, "..variable..")"
+        return string.format('translator.Push%s(L, %s)', CSVariableName(t), variable)
     elseif t.IsGenericParameter and not t.DeclaringMethod then
-	    return "translator.PushByType(L, "..variable..")"
-	elseif t.IsInterface or GetNullableUnderlyingType(t) then
-	    return "translator.PushAny(L, "..variable..")"
+        return string.format('translator.PushByType(L, %s)', variable)
+    elseif t.IsInterface or GetNullableUnderlyingType(t) then
+        return string.format('translator.PushAny(L, %s)', variable)
     else
-        return "translator.Push(L, "..variable..")"
+        return string.format('translator.Push(L, %s)', variable)
     end
 end
 

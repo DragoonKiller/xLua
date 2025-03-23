@@ -13,7 +13,18 @@ namespace XLua
     [Serializable]
     public class LuaException : Exception
     {
-        public LuaException(string message) : base(message)
-        {}
+        public LuaException(string message) : base(GetCorrectMessage(message))
+        {
+            
+        }
+        
+        static string GetCorrectMessage(string message)
+        {
+            if(LuaVM.valid)
+            {
+                return LuaVM.vm.Traceback(message);
+            }
+            return message;
+        }
     }
 }
