@@ -20,9 +20,9 @@ namespace XLua
         
         static string GetCorrectMessage(string message)
         {
-            if(LuaVM.valid)
+            if(LuaVM.instanceValid)
             {
-                return LuaVM.vm.Traceback(message);
+                return LuaVM.instance.env.Traceback(message);
             }
             return message;
         }

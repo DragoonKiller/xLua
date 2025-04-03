@@ -176,12 +176,9 @@ namespace XLua
 
                 errorFuncRef = LuaAPI.get_error_func_ref(rawL);
 
-                if (initers != null)
+                for (int i = 0; i < initers.Count; i++)
                 {
-                    for (int i = 0; i < initers.Count; i++)
-                    {
-                        initers[i](this, translator);
-                    }
+                    initers[i](this, translator);
                 }
 
                 translator.CreateArrayMetatable(rawL);
@@ -190,14 +187,10 @@ namespace XLua
             }
         }
 
-        private static List<Action<LuaEnv, ObjectTranslator>> initers = null;
+        private static List<Action<LuaEnv, ObjectTranslator>> initers = new();
 
         public static void AddIniter(Action<LuaEnv, ObjectTranslator> initer)
         {
-            if (initers == null)
-            {
-                initers = new List<Action<LuaEnv, ObjectTranslator>>();
-            }
             initers.Add(initer);
         }
 

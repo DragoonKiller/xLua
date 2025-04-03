@@ -1627,18 +1627,18 @@ namespace XLua
                     {typeof(uint), new Func<RealStatePtr, int, uint>(LuaAPI.xlua_touint) },
                     {typeof(float), new Func<RealStatePtr, int, float>((L, idx) => (float)LuaAPI.lua_tonumber(L, idx) ) },
                     {typeof(LightLuaTable), new Func<RealStatePtr, int, LightLuaTable>((L, idx) => {
-                        Debug.Assert(LuaVM.vm.L == L);
+                        Debug.Assert(LuaVM.instance.env.L == L);
                         LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
                         if(!LuaAPI.lua_istable(L, -1)) return default;              // return a table that is not usable.
                         var r = LuaAPI.luaL_ref(L);   // add table to index.
-                        return LightLuaTable.FromRef(LuaVM.vm, r);                  // must be current vm.
+                        return LightLuaTable.FromRef(LuaVM.instance, r);                  // must be current vm.
                     }) },
                     {typeof(LightLuaFunction), new Func<RealStatePtr, int, LightLuaFunction>((L, idx) => {
-                        Debug.Assert(LuaVM.vm.L == L);
+                        Debug.Assert(LuaVM.instance.env.L == L);
                         LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
                         if(!LuaAPI.lua_isfunction(L, -1)) return default;           // return a function that is not usable.
                         var r = LuaAPI.luaL_ref(L);   // add function to index.
-                        return LightLuaFunction.FromRef(LuaVM.vm, r);               // must be current vm.
+                        return LightLuaFunction.FromRef(LuaVM.instance, r);               // must be current vm.
                     }) },
                     {typeof(Vector2), new Func<RealStatePtr, int, Vector2>((L, v) => {
                         this.Get(L, v, out Vector2 ret);

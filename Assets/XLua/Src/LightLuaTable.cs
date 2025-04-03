@@ -8,7 +8,7 @@ using XLua;
 
 using LuaAPI = XLua.LuaDLL.Lua;
 
-public struct LightLuaTable : IDisposable
+public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
 {
     // static Dictionary<string, int> debugList = new();
     // string createPlace;
@@ -28,7 +28,8 @@ public struct LightLuaTable : IDisposable
     //     debugList[createPlace] -= 1;
     // }
     // 
-    public LuaEnv vm { get; private set; }
+    public LuaVM vm { get; private set; }
+    public LuaEnv env => vm.env;
     public int reference { get; private set; }
     public UnityEngine.Object backref { get; private set; }
     
@@ -45,13 +46,13 @@ public struct LightLuaTable : IDisposable
             {    
                 using var _ = LuaUtils.CallNative(out var L);
                 LuaAPI.lua_getref(L, reference);
-                _addr = LuaAPI.lua_topointer(vm.L, -1);
+                _addr = LuaAPI.lua_topointer(env.L, -1);
             }
             return _addr;
         }
     }
     
-    LightLuaTable(LuaEnv vm, int reference, UnityEngine.Object backref)
+    LightLuaTable(LuaVM vm, int reference, UnityEngine.Object backref)
     {
         this.vm = vm;
         this.reference = reference;
@@ -61,7 +62,7 @@ public struct LightLuaTable : IDisposable
         // Record();
     }
     
-    LightLuaTable(LuaEnv vm, int reference)
+    LightLuaTable(LuaVM vm, int reference)
     {
         this.vm = vm;
         this.reference = reference;
@@ -71,12 +72,12 @@ public struct LightLuaTable : IDisposable
         // Record();
     }
     
-    public static LightLuaTable FromRef(LuaEnv vm, int reference)
+    public static LightLuaTable FromRef(LuaVM vm, int reference)
     {
         return new LightLuaTable(vm, reference);
     }
     
-    public static LightLuaTable New(LuaEnv vm, UnityEngine.Object backref = null)
+    public static LightLuaTable New(LuaVM vm, UnityEngine.Object backref = null)
     {
         using var _ = LuaUtils.CallNative(out var L);
         LuaAPI.lua_newtable(L);
@@ -84,13 +85,12 @@ public struct LightLuaTable : IDisposable
         Debug.Assert(udata == -1);
         LuaAPI.lua_pushvalue(L, -1);
         var r = LuaAPI.luaL_ref(L);
-        var v = vm.translator.luaEnv;
-        return new LightLuaTable(v, r, backref);
+        return new LightLuaTable(vm, r, backref);
     }
     
     public void Dispose()
     {
-        vm.translator.ReleaseLuaBase(vm.L, reference, false);
+        env.translator.ReleaseLuaBase(env.L, reference, false);
         this.reference = 0;
         // RemoveRecord();
     }
@@ -103,7 +103,7 @@ public struct LightLuaTable : IDisposable
     //     }
     // }
     
-    public void push() => LuaAPI.lua_getref(vm.L, reference);
+    public void push() => LuaAPI.lua_getref(env.L, reference);
     
     // ====================================================================================================
     // ====================================================================================================
@@ -167,7 +167,7 @@ public struct LightLuaTable : IDisposable
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
-        vm.translator.PushByType(L, value);     // stack: table, key, value
+        env.translator.PushByType(L, value);     // stack: table, key, value
         LuaAPI.xlua_psettable(L, -3);           // stack: table
     }
     
@@ -261,7 +261,7 @@ public struct LightLuaTable : IDisposable
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
-        vm.translator.PushByType(L, value);     // stack: table, key, value
+        env.translator.PushByType(L, value);     // stack: table, key, value
         LuaAPI.xlua_psettable(L, -3);           // stack: table
     }
     
@@ -278,7 +278,7 @@ public struct LightLuaTable : IDisposable
         LuaAPI.lua_pushstring(L, key);                      // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
         if(!LuaUtils.CommonErrorHandler(success, backref)) return false;
-        vm.translator.Get(L, -1, out value);
+        env.translator.Get(L, -1, out value);
         return true;
     }
     
@@ -291,7 +291,7 @@ public struct LightLuaTable : IDisposable
         LuaAPI.xlua_pushinteger(L, key);                       // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
         if(!LuaUtils.CommonErrorHandler(success, backref)) return false;
-        vm.translator.Get(L, -1, out value);
+        env.translator.Get(L, -1, out value);
         return true;
     }
     
@@ -301,10 +301,10 @@ public struct LightLuaTable : IDisposable
         value = default;
         using var _ = LuaUtils.CallNative(out var L);
         push();                                             // stack: table
-        vm.translator.PushByType(L, key);                   // stack: table, key
+        env.translator.PushByType(L, key);                   // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
         if(!LuaUtils.CommonErrorHandler(success, backref)) return false;
-        value = vm.translator.GetObject(L, -1);
+        value = env.translator.GetObject(L, -1);
         return true;
     }
     
@@ -312,7 +312,7 @@ public struct LightLuaTable : IDisposable
     public int GetNative(string key)
     {
         if(!valid) throw new LuaException("LightLuaTable is invalid");
-        var L = vm.L;
+        var L = env.L;
         push();                                             // stack: table
         LuaAPI.lua_pushstring(L, key);                      // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
@@ -323,7 +323,7 @@ public struct LightLuaTable : IDisposable
     public int GetNative(float key)
     {
         if(!valid) throw new LuaException("LightLuaTable is invalid");
-        var L = vm.L;
+        var L = env.L;
         push();                                             // stack: table
         LuaAPI.lua_pushnumber(L, key);                      // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
@@ -334,7 +334,7 @@ public struct LightLuaTable : IDisposable
     public int GetNative(int key)
     {
         if(!valid) throw new LuaException("LightLuaTable is invalid");
-        var L = vm.L;
+        var L = env.L;
         push();                                             // stack: table
         LuaAPI.xlua_pushinteger(L, key);                       // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
@@ -345,7 +345,7 @@ public struct LightLuaTable : IDisposable
     public int GetNative(long key)
     {
         if(!valid) throw new LuaException("LightLuaTable is invalid");
-        var L = vm.L;
+        var L = env.L;
         push();                                             // stack: table
         LuaAPI.lua_pushint64(L, key);                       // stack: table, key
         var success = LuaAPI.xlua_pgettable(L, -2);         // stack: table, value
@@ -360,7 +360,7 @@ public struct LightLuaTable : IDisposable
     {
         using var _ = LuaUtils.CallNative(out var L);
         LuaAPI.lua_getref(L, reference);
-        var res = vm.translator.GetObject(L, -1) as LuaTable;
+        var res = env.translator.GetObject(L, -1) as LuaTable;
         return res;
     }
     
@@ -378,7 +378,7 @@ public struct LightLuaTable : IDisposable
     {
         if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
-        LuaUtils._clearTableFunc.push(L);               // stack: func
+        vm.clearTableFunc.push();                       // stack: func
         push();                                         // stack: func, table
         var success = LuaAPI.lua_pcall(L, 1, 0, 0);     // stack: func
         if(!LuaUtils.CommonErrorHandler(success, backref)) return;
@@ -387,7 +387,7 @@ public struct LightLuaTable : IDisposable
     public IEnumerable<object> GetKeys()
     {
         using var _ = LuaUtils.CallNative(out var L);
-        var translator = vm.translator;
+        var translator = env.translator;
         LuaAPI.lua_getref(L, reference);
         LuaAPI.lua_pushnil(L);
         while (LuaAPI.lua_next(L, -2) != 0)
@@ -400,7 +400,7 @@ public struct LightLuaTable : IDisposable
     public IEnumerable<string> GetStringKeys()
     {
         using var _ = LuaUtils.CallNative(out var L);
-        var translator = vm.translator;
+        var translator = env.translator;
         LuaAPI.lua_getref(L, reference);
         LuaAPI.lua_pushnil(L);
         while (LuaAPI.lua_next(L, -2) != 0)
@@ -417,7 +417,7 @@ public struct LightLuaTable : IDisposable
     public IEnumerable<int> GetIntKeys()
     {
         using var _ = LuaUtils.CallNative(out var L);
-        var translator = vm.translator;
+        var translator = env.translator;
         LuaAPI.lua_getref(L, reference);
         LuaAPI.lua_pushnil(L);
         while (LuaAPI.lua_next(L, -2) != 0)
@@ -433,7 +433,7 @@ public struct LightLuaTable : IDisposable
     public IEnumerable<long> GetInt64Keys()
     {
         using var _ = LuaUtils.CallNative(out var L);
-        var translator = vm.translator;
+        var translator = env.translator;
         LuaAPI.lua_getref(L, reference);
         LuaAPI.lua_pushnil(L);
         while (LuaAPI.lua_next(L, -2) != 0)
@@ -449,7 +449,7 @@ public struct LightLuaTable : IDisposable
     public IEnumerable<float> GetFloatKeys()
     {
         using var _ = LuaUtils.CallNative(out var L);
-        var translator = vm.translator;
+        var translator = env.translator;
         LuaAPI.lua_getref(L, reference);
         LuaAPI.lua_pushnil(L);
         while (LuaAPI.lua_next(L, -2) != 0)
@@ -461,6 +461,27 @@ public struct LightLuaTable : IDisposable
             LuaAPI.lua_pop(L, 1);
         }
     }
+
+    #endregion
+    
+    
+    #region IEquatable
+    
+    public bool Equals(LightLuaTable other)
+        => this.reference == other.reference && this.env == other.env;
+    
+    public override bool Equals(object obj)
+        => obj is LightLuaTable t && Equals(t);
+    
+    public override int GetHashCode()
+        => reference.GetHashCode() ^ env.GetHashCode();
+    
+    public static bool operator ==(LightLuaTable a, LightLuaTable b)
+        => a.Equals(b);
+    
+    public static bool operator !=(LightLuaTable a, LightLuaTable b)
+        => !a.Equals(b);
     
     #endregion
+    
 }

@@ -193,15 +193,12 @@ namespace XLua.LuaDLL
         // ====================================================================================================
         // ====================================================================================================
         
-        public static Dictionary<int, string> refs = new();
-        
         [DllImport(LUADLL,CallingConvention=CallingConvention.Cdecl)]
 		static extern int luaL_ref(IntPtr L, int registryIndex);
         
         public static int luaL_ref(IntPtr L)//[-1, +0, m]
         {
             var res = luaL_ref(L,LuaIndexes.LUA_REGISTRYINDEX);
-            // refs.Add(res, Environment.StackTrace);
 			return res;
 		}
 
@@ -211,7 +208,6 @@ namespace XLua.LuaDLL
 		public static void lua_unref(IntPtr L, int reference)
 		{
             UnityEngine.Debug.Assert(reference != 0);
-            // refs.Remove(reference);
 			luaL_unref(L,LuaIndexes.LUA_REGISTRYINDEX,reference);
 		}
 
