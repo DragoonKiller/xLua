@@ -1,0 +1,68 @@
+﻿
+
+<linker>
+
+	<assembly fullname="mscorlib">
+	    <type fullname="System.Object" preserve="all"/>
+		<type fullname="System.ValueType" preserve="all"/>
+		<type fullname="System.Enum" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.CoreModule">
+	    <type fullname="UnityEngine.Vector3" preserve="all"/>
+		<type fullname="UnityEngine.Vector4" preserve="all"/>
+		<type fullname="UnityEngine.Quaternion" preserve="all"/>
+		<type fullname="UnityEngine.Color" preserve="all"/>
+		<type fullname="UnityEngine.Ray" preserve="all"/>
+		<type fullname="UnityEngine.Bounds" preserve="all"/>
+		<type fullname="UnityEngine.Ray2D" preserve="all"/>
+		<type fullname="UnityEngine.Rect" preserve="all"/>
+		<type fullname="UnityEngine.Mathf" preserve="all"/>
+		<type fullname="UnityEngine.KeyCode" preserve="all"/>
+		<type fullname="UnityEngine.Time" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="UnityEngine.InputLegacyModule">
+	    <type fullname="UnityEngine.Input" preserve="all"/>
+		
+	</assembly>
+
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="DefenseGridLayer" preserve="all"/>
+		<type fullname="Coord" preserve="all"/>
+		<type fullname="_Lua_DefenseGrid" preserve="all"/>
+		<type fullname="RangeLayer" preserve="all"/>
+		<type fullname="_Lua_Range" preserve="all"/>
+		<type fullname="RangeQueryMode" preserve="all"/>
+		<type fullname="_Lua_RangeQuery" preserve="all"/>
+		<type fullname="PassiveMovementType" preserve="all"/>
+		<type fullname="_Lua_PassiveMovement" preserve="all"/>
+		<type fullname="_Lua_Localization" preserve="all"/>
+		<type fullname="_Lua_Physics" preserve="all"/>
+		<type fullname="_Lua_StringCache" preserve="all"/>
+		<type fullname="LuaCSNode" preserve="all"/>
+		<type fullname="LuaCSApplication" preserve="all"/>
+		<type fullname="LuaCSAsset" preserve="all"/>
+		<type fullname="LuaCSAudio" preserve="all"/>
+		<type fullname="LuaCSCamera" preserve="all"/>
+		<type fullname="LuaCSCanvas" preserve="all"/>
+		<type fullname="LuaCSEventSystem" preserve="all"/>
+		<type fullname="LuaCSFile" preserve="all"/>
+		<type fullname="LuaLayerMask" preserve="all"/>
+		<type fullname="LuaCSLineRenderer" preserve="all"/>
+		<type fullname="LuaCSLog" preserve="all"/>
+		<type fullname="LuaCSMath" preserve="all"/>
+		<type fullname="LuaCSParticleSystem" preserve="all"/>
+		<type fullname="LuaCSProfiler" preserve="all"/>
+		<type fullname="LuaCSShader" preserve="all"/>
+		<type fullname="LuaCSTrailRenderer" preserve="all"/>
+		<type fullname="Lua_Arc" preserve="all"/>
+		<type fullname="LuaCallUICircle" preserve="all"/>
+		<type fullname="LuaCallMeshCircle" preserve="all"/>
+		<type fullname="LuaMultithread.LuaCSMT" preserve="all"/>
+		
+	</assembly>
+
+</linker>
