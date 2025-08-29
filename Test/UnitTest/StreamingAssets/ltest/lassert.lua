@@ -4,7 +4,7 @@
 // auth : macroli(idehong@gmail.com)
 // ver  : 0.3
 // desc : assert and except 
-//////////////////////////////////////////////////////////////////////////    
+//////////////////////////////////////////////////////////////////////////	
 --]]
 -----------------------------------------------------------
 
@@ -30,9 +30,9 @@ end
 
 local CBaseAssert = {}
 function CBaseAssert:new(oo)
-    local o = oo or {}
-    setmetatable(o, assert_mt_base)
-    return o
+	local o = oo or {}
+	setmetatable(o, assert_mt_base)
+	return o
 end
 
 
@@ -56,17 +56,17 @@ end
 
 local CNumberAssert = {}
 function CNumberAssert:new(oo)
-    local o = oo or {}
-    setmetatable(o, assert_mt_default)
-    return o
+	local o = oo or {}
+	setmetatable(o, assert_mt_default)
+	return o
 end
 
 
 local CStringAssert = {}
 function CStringAssert:new(oo)
-    local o = oo or {}
-    setmetatable(o, assert_mt_default)
-    return o
+	local o = oo or {}
+	setmetatable(o, assert_mt_default)
+	return o
 end
 
 local _strCmpField = ""
@@ -117,7 +117,7 @@ local function _cmpTable(left, right, iCurLevel, iMaxLevel)
 			if iTmpResult ~= _iTableEQ then return iTmpResult end			
 		else
 			return _iTableLT 
-		end			 
+		end			
 	end
 	
 	_strCmpField = string.format("level:%d, num: %d vs %d", iCurLevel, iLen1, iLen2)
@@ -149,7 +149,7 @@ local function _strTable(left, strTip, iCurLevel, iMaxLevel)
 			strTip = strTip .. _strTable(tmp1, strTip .. string.format("%s={", tostring(tK1[i]) ), iCurLevel + 1, iMaxLevel) .. "},"
 		else
 			strTip = strTip .. 	string.format("%s=%s,", tostring(tK1[i]), tostring(tmp1))
-		end	 
+		end	
 	end
 	
 	return strTip		
@@ -204,62 +204,62 @@ end
 
 local CTableAssert = {}
 function CTableAssert:new(oo)
-    local o = oo or {}
-    setmetatable(o, assert_mt_table)
-    return o
+	local o = oo or {}
+	setmetatable(o, assert_mt_table)
+	return o
 end
 
 
 -- for test assert and except
 CAssertMgr = {}
 function CAssertMgr:new(oo)
-    local o = oo or {}
-    o.result = true
-    o.at = {}
-    
-    o.at[tostring(type(nil)) 	  ] = {ld={}, rd={},}
-    local oTmp = o.at[tostring(type(nil))]    
-    oTmp.left  = CBaseAssert:new(oTmp.ld)
-    oTmp.right = CBaseAssert:new(oTmp.rd)
+	local o = oo or {}
+	o.result = true
+	o.at = {}
 	
-    o.at[tostring(type(1)) 	  ] = {ld={}, rd={},}
-    local oTmp = o.at[tostring(type(1))]    
-    oTmp.left  = CNumberAssert:new(oTmp.ld)
-    oTmp.right = CNumberAssert:new(oTmp.rd)
+	o.at[tostring(type(nil)) 	] = {ld={}, rd={},}
+	local oTmp = o.at[tostring(type(nil))]	
+	oTmp.left  = CBaseAssert:new(oTmp.ld)
+	oTmp.right = CBaseAssert:new(oTmp.rd)
+	
+	o.at[tostring(type(1)) 	] = {ld={}, rd={},}
+	local oTmp = o.at[tostring(type(1))]	
+	oTmp.left  = CNumberAssert:new(oTmp.ld)
+	oTmp.right = CNumberAssert:new(oTmp.rd)
 
-    o.at[tostring(type("")) 	  ] = {ld={}, rd={},}
-    local oTmp = o.at[tostring(type(""))]    
-    oTmp.left  = CStringAssert:new(oTmp.ld)
-    oTmp.right = CStringAssert:new(oTmp.rd)
-    
-    o.at[tostring(type(true)) 	  ] = {ld={}, rd={},}
-    local oTmp = o.at[tostring(type(true))]    
-    oTmp.left  = CBaseAssert:new(oTmp.ld)
-    oTmp.right = CBaseAssert:new(oTmp.rd)    
+	o.at[tostring(type("")) 	] = {ld={}, rd={},}
+	local oTmp = o.at[tostring(type(""))]	
+	oTmp.left  = CStringAssert:new(oTmp.ld)
+	oTmp.right = CStringAssert:new(oTmp.rd)
+	
+	o.at[tostring(type(true)) 	] = {ld={}, rd={},}
+	local oTmp = o.at[tostring(type(true))]	
+	oTmp.left  = CBaseAssert:new(oTmp.ld)
+	oTmp.right = CBaseAssert:new(oTmp.rd)	
  
-    o.at[tostring(type({})) 	  ] = {ld={}, rd={},}
-    local oTmp = o.at[tostring(type({}))]    
-    oTmp.left  = CTableAssert:new(oTmp.ld)
-    oTmp.right = CTableAssert:new(oTmp.rd)    
+	o.at[tostring(type({})) 	] = {ld={}, rd={},}
+	local oTmp = o.at[tostring(type({}))]	
+	oTmp.left  = CTableAssert:new(oTmp.ld)
+	oTmp.right = CTableAssert:new(oTmp.rd)	
 
-    o.at[tostring(type(print)) 	  ] = {ld={}, rd={},}
-    local oTmp = o.at[tostring(type(print))]    
-    oTmp.left  = CBaseAssert:new(oTmp.ld)
-    oTmp.right = CBaseAssert:new(oTmp.rd)    
+	o.at[tostring(type(print)) 	] = {ld={}, rd={},}
+	local oTmp = o.at[tostring(type(print))]	
+	oTmp.left  = CBaseAssert:new(oTmp.ld)
+	oTmp.right = CBaseAssert:new(oTmp.rd)	
 
-    o.at["thread"] = {ld={}, rd={},}
-    local oTmp = o.at["thread"]    
-    oTmp.left  = CBaseAssert:new(oTmp.ld)
-    oTmp.right = CBaseAssert:new(oTmp.rd)    
+	o.at["thread"] = {ld={}, rd={},}
+	local oTmp = o.at["thread"]	
+	oTmp.left  = CBaseAssert:new(oTmp.ld)
+	oTmp.right = CBaseAssert:new(oTmp.rd)	
 
-    o.at["userdata"] = {ld={}, rd={},}
-    local oTmp = o.at["userdata"]    
-    oTmp.left  = CBaseAssert:new(oTmp.ld)
-    oTmp.right = CBaseAssert:new(oTmp.rd)    
+	o.at["userdata"] = {ld={}, rd={},}
+	local oTmp = o.at["userdata"]	
+	oTmp.left  = CBaseAssert:new(oTmp.ld)
+	oTmp.right = CBaseAssert:new(oTmp.rd)	
    
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function CAssertMgr.GetResult(self)

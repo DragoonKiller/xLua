@@ -32,6 +32,7 @@ public static class GenConfig
                 typeof(Mathf),
                 typeof(KeyCode),
                 typeof(UnityEngine.Input),
+				typeof(Time),
             };
 
     [GCOptimize]
@@ -72,7 +73,7 @@ public static class GenConfig
         }
     }
 
-    //C#静态调用Lua的配置（包括事件的原型），仅可以配delegate，interface
+    //C#静态调用Lua的配置(包括事件的原型)，仅可以配delegate，interface
     [CSharpCallLua]
     public static List<Type> CSharpCallLua = new List<Type>() {
         
@@ -83,6 +84,7 @@ public static class GenConfig
     public static List<List<string>> BlackList = new List<List<string>>()  {
             new List<string>(){"UnityEngine.WWW", "movie"},
             new List<string>(){"LuaCSTimer+Timer", "LuaCSTimer+TimerQueue"},
+            new List<string>(){ "UnityEngine.Input", "IsJoystickPreconfigured","System.String"},
         };
     
     public static List<Type> BlackGenericTypeList = new List<Type>()

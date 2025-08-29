@@ -21,7 +21,7 @@ namespace XLua
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
+    // using System.Diagnostics;
 
     public class LuaEnv : IDisposable
     {
@@ -46,9 +46,25 @@ namespace XLua
 
         private LuaTable _G;
 
-        internal ObjectTranslator translator;
+        public ObjectTranslator translator;
 
-        internal int errorFuncRef = -1;
+        int _errorFuncRef = -1;
+        public int errorFuncRef
+        {
+            get
+            {
+                if(_errorFuncRef == -1)
+                {
+                    using(new LuaUtils.LuaStackTopGuard(L))
+                    {
+                        _errorFuncRef = LuaAPI.get_error_func_ref(rawL);
+                    }
+                    UnityEngine.Debug.Assert(_errorFuncRef != -1, "errorFuncRef should not be -1!");
+                }
+                return _errorFuncRef;
+            }
+            set => _errorFuncRef = value;
+        }
 
 #if THREAD_SAFE || HOTFIX_ENABLE
         internal /*static*/ object luaLock = new object();
@@ -173,8 +189,6 @@ namespace XLua
                 }
                 translator.Get(rawL, -1, out _G);
                 LuaAPI.lua_pop(rawL, 1);
-
-                errorFuncRef = LuaAPI.get_error_func_ref(rawL);
 
                 for (int i = 0; i < initers.Count; i++)
                 {
@@ -374,7 +388,7 @@ namespace XLua
                 
                 // version 2 copied from xlua code
                 int udata = LuaAPI.xlua_tocsobj_safe(L, -1);
-                Debug.Assert(udata == -1);
+                UnityEngine.Debug.Assert(udata == -1);
                 LuaAPI.lua_pushvalue(L, -1);
                 var returnVal = new LuaTable(LuaAPI.luaL_ref(L), translator.luaEnv);
                 

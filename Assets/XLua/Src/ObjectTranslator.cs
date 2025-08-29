@@ -112,8 +112,8 @@ namespace XLua
         internal ObjectCheckers objectCheckers;
         internal ObjectCasters objectCasters;
 
-        internal readonly ObjectPool objects = new ObjectPool();
-        internal readonly Dictionary<object, int> reverseMap = new Dictionary<object, int>(new ReferenceEqualsComparer());
+        public readonly ObjectPool objects = new ObjectPool();
+        public readonly Dictionary<object, int> reverseMap = new Dictionary<object, int>(new ReferenceEqualsComparer());
 		internal LuaEnv luaEnv;
 		internal StaticLuaCallbacks metaFunctions;
 		internal List<Assembly> assemblies;
@@ -1629,14 +1629,20 @@ namespace XLua
                     {typeof(LightLuaTable), new Func<RealStatePtr, int, LightLuaTable>((L, idx) => {
                         Debug.Assert(LuaVM.instance.env.L == L);
                         LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
-                        if(!LuaAPI.lua_istable(L, -1)) return default;              // return a table that is not usable.
+                        if(!LuaAPI.lua_istable(L, -1))
+						{
+							return default;
+						}
                         var r = LuaAPI.luaL_ref(L);   // add table to index.
                         return LightLuaTable.FromRef(LuaVM.instance, r);                  // must be current vm.
                     }) },
                     {typeof(LightLuaFunction), new Func<RealStatePtr, int, LightLuaFunction>((L, idx) => {
                         Debug.Assert(LuaVM.instance.env.L == L);
                         LuaAPI.lua_pushvalue(L, idx);                               // from idx to top
-                        if(!LuaAPI.lua_isfunction(L, -1)) return default;           // return a function that is not usable.
+                        if(!LuaAPI.lua_isfunction(L, -1))
+						{
+							return default;           // return a function that is not usable.
+						}
                         var r = LuaAPI.luaL_ref(L);   // add function to index.
                         return LightLuaFunction.FromRef(LuaVM.instance, r);               // must be current vm.
                     }) },

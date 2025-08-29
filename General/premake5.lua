@@ -1,22 +1,22 @@
 
 solution "XLua"
-    configurations {
-        "Debug", "Release"
-    }
+	configurations {
+		"Debug", "Release"
+	}
 
-    location ("./" .. (_ACTION or ""))
-    debugdir (".")
-    debugargs {  }
+	location ("./" .. (_ACTION or ""))
+	debugdir (".")
+	debugargs {  }
 
-    platforms { "Any CPU" }
+	platforms { "Any CPU" }
 
 configuration "Debug"
-    symbols "On"
-    defines { "_DEBUG", "DEBUG", "TRACE" }
+	symbols "On"
+	defines { "_DEBUG", "DEBUG", "TRACE" }
 configuration "Release"
-    flags { "Optimize" }
+	flags { "Optimize" }
 configuration "vs*"
-    defines { "" }
+	defines { "" }
 
 project "XLua.Mini"
 language "C#"
@@ -26,8 +26,8 @@ targetdir "./Tools"
 
 files
 {
-    "../Assets/XLua/Src/*.cs",
-    "../Assets/XLua/Src/TemplateEngine/*.cs",
+	"../Assets/XLua/Src/*.cs",
+	"../Assets/XLua/Src/TemplateEngine/*.cs",
 }
 
 defines
@@ -37,8 +37,8 @@ defines
 
 links
 {
-    "System",
-    "System.Core",
+	"System",
+	"System.Core",
 }
 
 project "XLuaGenerate"
@@ -49,24 +49,24 @@ targetdir "./Tools"
 
 files
 {
-    "./Src/XLuaGenerate.cs",
-    "./Src/XLuaTemplates.Designer.cs",
-    "./Src/XLuaTemplates.resx",
-    "../Assets/XLua/Src/Editor/Generator.cs",
-    "../Assets/XLua/Src/Editor/Template/*.txt",
+	"./Src/XLuaGenerate.cs",
+	"./Src/XLuaTemplates.Designer.cs",
+	"./Src/XLuaTemplates.resx",
+	"../Assets/XLua/Src/Editor/Generator.cs",
+	"../Assets/XLua/Src/Editor/Template/*.txt",
 }
 
 defines
 {
-    "XLUA_GENERAL",
-    "XLUA_ALL_OBSOLETE",
+	"XLUA_GENERAL",
+	"XLUA_ALL_OBSOLETE",
 }
 
 links
 {
-    "System",
-    "System.Core",
-    "XLua.Mini",
+	"System",
+	"System.Core",
+	"XLua.Mini",
 }
 
 project "XLuaHotfixInject"
@@ -77,24 +77,24 @@ targetdir "./Tools"
 
 files
 {
-    "./Src/XLuaHotfixInject.cs",
-    "../Assets/XLua/Src/Editor/Hotfix.cs",
+	"./Src/XLuaHotfixInject.cs",
+	"../Assets/XLua/Src/Editor/Hotfix.cs",
 }
 
 defines
 {
-    "HOTFIX_ENABLE",
-    "XLUA_GENERAL",
+	"HOTFIX_ENABLE",
+	"XLUA_GENERAL",
 }
 
 links
 {
-    --"C:/Program Files/Unity/Editor/Data/Mono/lib/mono/unity/mscorlib.dll",
-    "C:/Program Files/Unity/Editor/Data/Mono/lib/mono/unity/System.dll",
-    "C:/Program Files/Unity/Editor/Data/Mono/lib/mono/unity/System.Core.dll",
-    "Lib/Mono.Cecil.dll",
-    "Lib/Mono.Cecil.Mdb.dll",
-    "Lib/Mono.Cecil.Pdb.dll",
+	--"C:/Program Files/Unity/Editor/Data/Mono/lib/mono/unity/mscorlib.dll",
+	"C:/Program Files/Unity/Editor/Data/Mono/lib/mono/unity/System.dll",
+	"C:/Program Files/Unity/Editor/Data/Mono/lib/mono/unity/System.Core.dll",
+	"Lib/Mono.Cecil.dll",
+	"Lib/Mono.Cecil.Mdb.dll",
+	"Lib/Mono.Cecil.Pdb.dll",
 }
 
 
@@ -106,7 +106,7 @@ targetdir "./Tools"
 
 files
 {
-    "./Src/KeyPairsGen.cs",
+	"./Src/KeyPairsGen.cs",
 }
 
 defines
@@ -115,8 +115,8 @@ defines
 
 links
 {
-    "System",
-    "System.Core",
+	"System",
+	"System.Core",
 }
 
 project "FilesSignature"
@@ -127,7 +127,7 @@ targetdir "./Tools"
 
 files
 {
-    "./Src/FilesSignature.cs",
+	"./Src/FilesSignature.cs",
 }
 
 defines
@@ -136,8 +136,8 @@ defines
 
 links
 {
-    "System",
-    "System.Core",
+	"System",
+	"System.Core",
 }
 
 project "XLuaTest"
@@ -148,7 +148,7 @@ targetdir "./Bin"
 
 files
 {
-    "./Src/XLuaTest.cs",
+	"./Src/XLuaTest.cs",
 }
 
 defines
@@ -157,9 +157,9 @@ defines
 
 links
 {
-    "System",
-    "System.Core",
-    "XLua.Mini",
+	"System",
+	"System.Core",
+	"XLua.Mini",
 }
 
 project "XLuaUnitTest"
@@ -170,40 +170,40 @@ targetdir "./Bin"
 
 files
 {
-    "./Src/XLuaUnitTest.cs",
-    "../Test/UnitTest/xLuaTest/**.cs",
+	"./Src/XLuaUnitTest.cs",
+	"../Test/UnitTest/xLuaTest/**.cs",
 }
 
 defines
 {
-    "XLUA_GENERAL",
+	"XLUA_GENERAL",
 }
 
 links
 {
-    "System",
-    "System.Core",
-    "XLua.Mini",
+	"System",
+	"System.Core",
+	"XLua.Mini",
 }
 
 solution "XLuaGenTest"
-    configurations {
-        "Debug", "Release"
-    }
+	configurations {
+		"Debug", "Release"
+	}
 
-    location ("./" .. (_ACTION or ""))
-    debugdir (".")
-    debugargs {  }
+	location ("./" .. (_ACTION or ""))
+	debugdir (".")
+	debugargs {  }
 
-    platforms { "Any CPU" }
+	platforms { "Any CPU" }
 
 configuration "Debug"
-    symbols "On"
-    defines { "_DEBUG", "DEBUG", "TRACE" }
+	symbols "On"
+	defines { "_DEBUG", "DEBUG", "TRACE" }
 configuration "Release"
-    flags { "Optimize" }
+	flags { "Optimize" }
 configuration "vs*"
-    defines { "" }
+	defines { "" }
 
 project "XLuaTestGenCode"
 language "C#"
@@ -213,22 +213,22 @@ targetdir "./Bin"
 
 files
 {
-    "./Src/XLuaTest.cs",
-    "../Assets/XLua/Src/*.cs",
-    "../Assets/XLua/Src/TemplateEngine/*.cs",
-    "./Gen1/*.cs",
+	"./Src/XLuaTest.cs",
+	"../Assets/XLua/Src/*.cs",
+	"../Assets/XLua/Src/TemplateEngine/*.cs",
+	"./Gen1/*.cs",
 }
 
 defines
 {
-    "XLUA_GENERAL",
-    "HOTFIX_ENABLE",
+	"XLUA_GENERAL",
+	"HOTFIX_ENABLE",
 }
 
 links
 {
-    "System",
-    "System.Core",
+	"System",
+	"System.Core",
 }
 
 
@@ -240,20 +240,20 @@ targetdir "./Bin"
 
 files
 {
-    "./Src/XLuaUnitTest.cs",
-    "../Test/UnitTest/xLuaTest/**.cs",
-    "../Assets/XLua/Src/*.cs",
-    "../Assets/XLua/Src/TemplateEngine/*.cs",
-    "./Gen2/*.cs",
+	"./Src/XLuaUnitTest.cs",
+	"../Test/UnitTest/xLuaTest/**.cs",
+	"../Assets/XLua/Src/*.cs",
+	"../Assets/XLua/Src/TemplateEngine/*.cs",
+	"./Gen2/*.cs",
 }
 
 defines
 {
-    "XLUA_GENERAL",
+	"XLUA_GENERAL",
 }
 
 links
 {
-    "System",
-    "System.Core",
+	"System",
+	"System.Core",
 }

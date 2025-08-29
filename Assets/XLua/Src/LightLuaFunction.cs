@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.Rendering;
 using UnityEngine;
 using XLua;
 
@@ -69,6 +68,7 @@ public struct LightLuaFunction : IDisposable
     
     public void Dispose()
     {
+        if(!this.valid) return;
         vm.translator.ReleaseLuaBase(vm.L, reference, false);
         this.reference = 0;
     }
@@ -84,7 +84,8 @@ public struct LightLuaFunction : IDisposable
         using var _ = LuaUtils.CallNative(out var L);
         int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
         push();
-        LuaAPI.lua_pcall(L, 0, 0, errf);
+        var success = LuaAPI.lua_pcall(L, 0, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
     }
     
     public void Call<T1>(T1 arg1)
@@ -94,7 +95,8 @@ public struct LightLuaFunction : IDisposable
         int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
         push();
         vm.translator.PushByType(L, arg1);
-        LuaAPI.lua_pcall(L, 1, 0, errf);
+        var success = LuaAPI.lua_pcall(L, 1, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
     }
     
     public void Call<T1, T2>(T1 arg1, T2 arg2)
@@ -105,7 +107,8 @@ public struct LightLuaFunction : IDisposable
         push();
         vm.translator.PushByType(L, arg1);
         vm.translator.PushByType(L, arg2);
-        LuaAPI.lua_pcall(L, 2, 0, errf);
+        var success = LuaAPI.lua_pcall(L, 2, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
     }
     
     public void Call<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3)
@@ -117,7 +120,53 @@ public struct LightLuaFunction : IDisposable
         vm.translator.PushByType(L, arg1);
         vm.translator.PushByType(L, arg2);
         vm.translator.PushByType(L, arg3);
-        LuaAPI.lua_pcall(L, 3, 0, errf);
+        var success = LuaAPI.lua_pcall(L, 3, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
+    }
+    
+    public void Call<T1, T2, T3, T4>(T1 arg1, T2 arg2, T3 arg3, T4 arg4)
+    {
+        if(!valid) throw new Exception("invalid lua function");
+        using var _ = LuaUtils.CallNative(out var L);
+        int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
+        push();
+        vm.translator.PushByType(L, arg1);
+        vm.translator.PushByType(L, arg2);
+        vm.translator.PushByType(L, arg3);
+        vm.translator.PushByType(L, arg4);
+        var success = LuaAPI.lua_pcall(L, 4, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
+    }
+    
+    public void Call<T1, T2, T3, T4, T5>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5)
+    {
+        if(!valid) throw new Exception("invalid lua function");
+        using var _ = LuaUtils.CallNative(out var L);
+        int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
+        push();
+        vm.translator.PushByType(L, arg1);
+        vm.translator.PushByType(L, arg2);
+        vm.translator.PushByType(L, arg3);
+        vm.translator.PushByType(L, arg4);
+        vm.translator.PushByType(L, arg5);
+        var success = LuaAPI.lua_pcall(L, 5, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
+    }
+    
+    public void Call<T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6)
+    {
+        if(!valid) throw new Exception("invalid lua function");
+        using var _ = LuaUtils.CallNative(out var L);
+        int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
+        push();
+        vm.translator.PushByType(L, arg1);
+        vm.translator.PushByType(L, arg2);
+        vm.translator.PushByType(L, arg3);
+        vm.translator.PushByType(L, arg4);
+        vm.translator.PushByType(L, arg5);
+        vm.translator.PushByType(L, arg6);
+        var success = LuaAPI.lua_pcall(L, 6, 0, errf);
+        LuaUtils.CommonErrorHandler(success, null);
     }
     
     public TResult CallR<TResult>()
@@ -126,7 +175,8 @@ public struct LightLuaFunction : IDisposable
         using var _ = LuaUtils.CallNative(out var L);
         int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
         push();
-        LuaAPI.lua_pcall(L, 0, 1, errf);
+        var success = LuaAPI.lua_pcall(L, 0, 1, errf);
+        LuaUtils.CommonErrorHandler(success, null);
         vm.translator.Get(L, -1, out TResult r);
         return r;
     }
@@ -138,7 +188,8 @@ public struct LightLuaFunction : IDisposable
         int errf = LuaAPI.load_error_func(L, vm.env.errorFuncRef);
         push();
         vm.translator.PushByType(L, arg1);
-        LuaAPI.lua_pcall(L, 1, 1, errf);
+        var success = LuaAPI.lua_pcall(L, 1, 1, errf);
+        LuaUtils.CommonErrorHandler(success, null);
         vm.translator.Get(L, -1, out TResult r);
         return r;
     }
@@ -151,7 +202,8 @@ public struct LightLuaFunction : IDisposable
         push();
         vm.translator.PushByType(L, arg1);
         vm.translator.PushByType(L, arg2);
-        LuaAPI.lua_pcall(L, 2, 1, errf);
+        var success = LuaAPI.lua_pcall(L, 2, 1, errf);
+        LuaUtils.CommonErrorHandler(success, null);
         vm.translator.Get(L, -1, out TResult r);
         return r;
     }
@@ -165,7 +217,8 @@ public struct LightLuaFunction : IDisposable
         vm.translator.PushByType(L, arg1);
         vm.translator.PushByType(L, arg2);
         vm.translator.PushByType(L, arg3);
-        LuaAPI.lua_pcall(L, 3, 1, errf);
+        var success = LuaAPI.lua_pcall(L, 3, 1, errf);
+        LuaUtils.CommonErrorHandler(success, null);
         vm.translator.Get(L, -1, out TResult r);
         return r;
     }

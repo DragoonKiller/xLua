@@ -4,7 +4,7 @@
 // auth : macroli(idehong@gmail.com)
 // ver  : 0.3
 // desc : ltest - lua tester 
-//////////////////////////////////////////////////////////////////////////    
+//////////////////////////////////////////////////////////////////////////	
 --]]
 -----------------------------------------------------------
 
@@ -15,10 +15,10 @@ VERSION = "0.51"
 -- for test environment
 TestEnvironment = {}
 function TestEnvironment:new(oo)
-    local o = oo or {}
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function TestEnvironment.privateName(self)
@@ -35,10 +35,10 @@ end
 -- for test case
 TestCase = {}
 function TestCase:new(oo)
-    local o = oo or {}
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function TestCase.privateName(self)
@@ -181,41 +181,41 @@ end
 -- for test mgr
 local TestMgr = {}
 function TestMgr:new(oo)
-    local o = {
-    	data = {
-	    	oOut = false, generalGlobalName="global",
-	    	
-	    	-- suite seq	    	
-	    	generalSuiteNo=2,  
-	    	
-	    	-- global suite value
-	    	global={ prop={name="global", generalNo=1,bSys=true, oCls=false, no=1, costTime=0, totalNum=0, okNum=0, failedNum=0,}, list={}},
+	local o = {
+		data = {
+			oOut = false, generalGlobalName="global",
+			
+			-- suite seq			
+			generalSuiteNo=2,  
+			
+			-- global suite value
+			global={ prop={name="global", generalNo=1,bSys=true, oCls=false, no=1, costTime=0, totalNum=0, okNum=0, failedNum=0,}, list={}},
 
 			-- key for name, value = {prop={}, list={}}
-	    	all_suite = {}, 
-	    	
-	    	-- filter case name
-	    	notcase = {privateName=true, SetUpTestCase=true, TearDownTestCase=true, SetUp=true, TearDown=true, TestCase=true, new=new},
-    	},
-    	
-    	-- user use para
-    	para = {
-    		ltest_list_tests=false,	 	-- List the names of all tests instead of running them.
-    		ltest_repeat=false,			-- Run the tests repeatedly; use a negative count to repeat forever.
-    		ltest_filter=false,			-- Run only the tests whose name matches
+			all_suite = {}, 
+			
+			-- filter case name
+			notcase = {privateName=true, SetUpTestCase=true, TearDownTestCase=true, SetUp=true, TearDown=true, TestCase=true, new=new},
+		},
+		
+		-- user use para
+		para = {
+			ltest_list_tests=false,		-- List the names of all tests instead of running them.
+			ltest_repeat=false,			-- Run the tests repeatedly; use a negative count to repeat forever.
+			ltest_filter=false,			-- Run only the tests whose name matches
 
-    		ltest_list_falied=false,	-- Generate an TXT report in the given directory or with the given file name
-    		ltest_output=false,			-- Generate an XML report in the given directory or with the given file name
-    		ltest_silence=false,		-- if true then silence output
-    	},
-    	
-    	-- stat info
-    	stat = {},
-    }
-    
-    setmetatable(o, self)
-    self.__index = self
-    return o
+			ltest_list_falied=false,	-- Generate an TXT report in the given directory or with the given file name
+			ltest_output=false,			-- Generate an XML report in the given directory or with the given file name
+			ltest_silence=false,		-- if true then silence output
+		},
+		
+		-- stat info
+		stat = {},
+	}
+	
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function TestMgr.Init(self, tPara)	
@@ -299,7 +299,7 @@ function TestMgr.Run(self, oEnv)
 	oOutput:BeginGroupSuite( iCount, iGroup )
 	
 	local bUseEnv = (oEnv and TestEnvironment:privateName() == oEnv:privateName())
-	if bUseEnv then	 oEnv:SetUp(); oOutput:BeginGroupEnv() end
+	if bUseEnv then	oEnv:SetUp(); oOutput:BeginGroupEnv() end
 
 	local tFailedList = self:runAllSuite(oOutput, tSuiteCaseKey)
 	

@@ -41,6 +41,7 @@ namespace XLua
         
         public LuaTable(int reference, LuaEnv luaenv) : base(reference, luaenv)
         {
+            
         }
 
         // no boxing version get

@@ -8,10 +8,10 @@ function islua53() return not not math.type end
 -- for test case
 CMyTestEnv = TestEnvironment:new()
 function CMyTestEnv:new(oo)
-    local o = oo or {}
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function CMyTestEnv.SetUp(self)
@@ -47,7 +47,7 @@ end)
 function main()
 
 
-    print(coroutine.resume(co));
+	print(coroutine.resume(co));
 	
 	local resultPath = CS.LuaTestCommon.resultPath
 	local tInitPara = {

@@ -2,9 +2,9 @@ tableValue1 = {
 key1 = 100000, key2 = 10, key3 = true,
 'red', 'yellow', 'green',
 sub = function(self, a, b) 
-			  print('tableValue1.sub called')
-			  return a - b 
-	  end,
+			print('tableValue1.sub called')
+			return a - b 
+	end,
 tableValueInclude = {
 1,2,3,4,5,6,7,8,9,0
 },

@@ -4,7 +4,7 @@
 // auth : macroli(idehong@gmail.com)
 // ver  : 0.3
 // desc : output 
-//////////////////////////////////////////////////////////////////////////    
+//////////////////////////////////////////////////////////////////////////	
 --]]
 -----------------------------------------------------------
 
@@ -13,10 +13,10 @@
 -- for test output
 local TestOutPutBase = {}
 function TestOutPutBase:new(oo)
-    local o = oo or {}
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function TestOutPutBase.FilterInfo(self, ...)
@@ -67,25 +67,25 @@ end
 -- for test output
 CmdTestOutPut = TestOutPutBase:new()
 function CmdTestOutPut:new(oo)
-    local o = oo or {}
-    o.output = {
-    	labelNum = 10,
-    	fmt = { left = "[%-10s]", right = "[%10s]", },
-    	label = { run = {label=" RUN", fmt="left",}, ok = {label="OK ",  fmt="right",}, failed = {label="  FAILED",  fmt="left",},
-    		passed = {label="  PASSED", fmt="left",},
-    		split = {label="--------", fmt="right",},  
-    		group = {label="==========", fmt="right",},
-    	},
-    }
-    o.stat = {
-    	iTotalCase = 0, iTotalSuite = 0, iTotalPassed = 0,
-    	tFailedName = {},  
-    	iCurrCaseCount = 0,  	
-    }
-    
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	o.output = {
+		labelNum = 10,
+		fmt = { left = "[%-10s]", right = "[%10s]", },
+		label = { run = {label=" RUN", fmt="left",}, ok = {label="OK ",  fmt="right",}, failed = {label="  FAILED",  fmt="left",},
+			passed = {label="  PASSED", fmt="left",},
+			split = {label="--------", fmt="right",},  
+			group = {label="==========", fmt="right",},
+		},
+	}
+	o.stat = {
+		iTotalCase = 0, iTotalSuite = 0, iTotalPassed = 0,
+		tFailedName = {},  
+		iCurrCaseCount = 0,  	
+	}
+	
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function CmdTestOutPut.outerList(self, strFun, ...)
@@ -136,11 +136,11 @@ function CmdTestOutPut.EndSuite(self, iNumber, strSuiteName, iTime, iFailedNum)
 end
 
 function CmdTestOutPut.BeginGroupSuite(self, iCaseNum, iSuiteNum)
-    self.stat = {
-    	iTotalCase = iCaseNum, iTotalSuite = iSuiteNum, iTotalPassed = 0,
-    	tFailedName = {},  
-    	iCurrCaseCount = 0,  	
-    }
+	self.stat = {
+		iTotalCase = iCaseNum, iTotalSuite = iSuiteNum, iTotalPassed = 0,
+		tFailedName = {},  
+		iCurrCaseCount = 0,  	
+	}
 	
 	self:Message("%s Running %d tests from %d test cases", self:getFMTStr("group"), iCaseNum, iSuiteNum)
 
@@ -182,8 +182,8 @@ function CmdTestOutPut.StaticInfo(self)
 	end
 	
 	self:outerList("StaticInfo")	
-    
-    error(string.format("%d SUITES, %d TESTS, %d FAILED", self.stat.iTotalSuite, self.stat.iTotalCase, iFailedNum))
+	
+	error(string.format("%d SUITES, %d TESTS, %d FAILED", self.stat.iTotalSuite, self.stat.iTotalCase, iFailedNum))
 end
 
 
@@ -205,11 +205,11 @@ end
 ------------------------------------------------------------
 CAllCaseListOutPut = TestOutPutBase:new()
 function CAllCaseListOutPut:new(oo)
-    local o = oo or {}
-    o.data = {f=false}
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	o.data = {f=false}
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function CAllCaseListOutPut.BeginCase(self, strLabelName)
@@ -240,11 +240,11 @@ end
 
 CFailedCaseListOutPut = TestOutPutBase:new()
 function CFailedCaseListOutPut:new(oo)
-    local o = oo or {}
-    o.data = {f=false}    
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	o.data = {f=false}	
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function CFailedCaseListOutPut.EndCase(self, bRun, bSuccess, iTime, strLabelName)

@@ -30,7 +30,7 @@ namespace XLua
 
         private Slot[] list = new Slot[512];
         private int freelist = LIST_END;
-        private int count = 0;
+        public int count {get; private set; } = 0;
 
         public object this[int i]
         {

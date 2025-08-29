@@ -198,6 +198,10 @@ namespace XLua.LuaDLL
         
         public static int luaL_ref(IntPtr L)//[-1, +0, m]
         {
+            // if(lua_type(L, -1) == LuaTypes.LUA_TNUMBER)
+            // {
+            //     LuaUtils.Log("create ref for number, please check your code.");
+            // }
             var res = luaL_ref(L,LuaIndexes.LUA_REGISTRYINDEX);
 			return res;
 		}

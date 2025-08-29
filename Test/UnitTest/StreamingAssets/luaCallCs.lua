@@ -7,110 +7,110 @@ function islua53() return not not math.type end
 -- for test case
 CMyTestCaseLuaCallCS = TestCase:new()
 function CMyTestCaseLuaCallCS:new(oo)
-    local o = oo or {}
-    o.count = 1
-    
-    setmetatable(o, self)
-    self.__index = self
-    return o
+	local o = oo or {}
+	o.count = 1
+	
+	setmetatable(o, self)
+	self.__index = self
+	return o
 end
 
 function CMyTestCaseLuaCallCS.SetUpTestCase(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	print("CMyTestCaseLuaCallCS.SetUpTestCase")
 end
 
 function CMyTestCaseLuaCallCS.TearDownTestCase(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	print("CMyTestCaseLuaCallCS.TearDownTestCase")
 end
 
 
 function CMyTestCaseLuaCallCS.SetUp(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	print("CMyTestCaseLuaCallCS.SetUp")
 end
 
 function CMyTestCaseLuaCallCS.TearDown(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 
 	print("CMyTestCaseLuaCallCS.TearDown")
 end
 
 
 function CMyTestCaseLuaCallCS.CaseDefaultParamFunc1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.DefaultParaFuncSingle(100, "abc")
 	ASSERT_EQ(ret, 100)
 end
 
 function CMyTestCaseLuaCallCS.CaseDefaultParamFunc2(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.DefaultParaFuncSingle(100)
 	ASSERT_EQ(ret, 100)
 end
 
 function CMyTestCaseLuaCallCS.CaseDefaultParamFunc3(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.DefaultParaFuncMulti(100, "")
 	ASSERT_EQ(ret, 101)
 end
 
 function CMyTestCaseLuaCallCS.CaseDefaultParamFunc4(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.DefaultParaFuncMulti(100, "efg", 1)
 	ASSERT_EQ(ret, 101)
 end
 
 function CMyTestCaseLuaCallCS.CaseDefaultParamFunc5(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.DefaultParaFuncMulti(100, "efg", 1, 98)
 	ASSERT_EQ(ret, 101)
 end
 
 function CMyTestCaseLuaCallCS.CaseDefaultParamFunc6(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	--if (CS.LuaTestCommon.IsMacPlatform() == false) then
-    if (true) then
+	if (true) then
 		local ret, error = pcall(function() CS.LuaTestObj.DefaultParaFuncMulti(100, "efg", 1, 98, 0) end)
 		ASSERT_EQ(ret, false)
-    else
-        ASSERT_EQ(true, false)
+	else
+		ASSERT_EQ(true, false)
 	end
 end
 
 function CMyTestCaseLuaCallCS.CaseVariableParamFunc1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.VariableParamFunc(0)
 	ASSERT_EQ(ret, 0)
 end
 
 function CMyTestCaseLuaCallCS.CaseVariableParamFunc2(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.VariableParamFunc(0, "a")
 	ASSERT_EQ(ret, 0)
 end
 
 function CMyTestCaseLuaCallCS.CaseVariableParamFunc3(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	--if (CS.LuaTestCommon.IsMacPlatform() == false) then
-    if (true) then
+	if (true) then
 		local ret, error = pcall(function() CS.LuaTestObj.VariableParamFunc(0, "a", 1, "b") end)
 		ASSERT_EQ(ret, true)
-    else
-        ASSERT_EQ(true, false)
+	else
+		ASSERT_EQ(true, false)
 	end
 end
 
 function CMyTestCaseLuaCallCS.CaseLuaAccessEnum1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestEnumFunc(CS.LuaTestType.DEF)
 	ASSERT_EQ(ret, 1)
 end
 
 --[[ 2016.11.25 新版本不支持整数直接当枚举用
 function CMyTestCaseLuaCallCS.CaseLuaAccessEnum2(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local enumValue = -1
 	local ret = CS.LuaTestObj.TestEnumFunc(enumValue)
 	ASSERT_EQ(ret, -1)
@@ -118,84 +118,84 @@ end
 ]]
 
 function CMyTestCaseLuaCallCS.CaseLuaAccessEnum3(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local enumValue = CS.LuaTestType.__CastFrom(2)
 	local ret = CS.LuaTestObj.TestEnumFunc(enumValue)
 	ASSERT_EQ(ret, 2)
 end
 
 function CMyTestCaseLuaCallCS.CaseLuaAccessEnum4(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local enumValue = CS.LuaTestType.__CastFrom(4)
 	local ret = CS.LuaTestObj.TestEnumFunc(enumValue)
 	ASSERT_EQ(ret, 4)
 end
 
 function CMyTestCaseLuaCallCS.CaseLuaAccessEnum5(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local enumValue = CS.LuaTestType.__CastFrom("GHI")
 	local ret = CS.LuaTestObj.TestEnumFunc(enumValue)
 	ASSERT_EQ(ret, 2)
 end
 
 function CMyTestCaseLuaCallCS.CaseLuaAccessEnum6(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	--if (CS.LuaTestCommon.IsMacPlatform() == false and CS.LuaTestCommon.IsIOSPlatform() == false) then
-    if (true) then
+	if (true) then
 		local ret, error = pcall(function() CS.LuaTestObj.TestEnumFunc(CS.LuaTestType.__CastFrom("BCD")) end)
 		ASSERT_EQ(ret, false)
-    else
-        ASSERT_EQ(true, false)
+	else
+		ASSERT_EQ(true, false)
 	end
 end
 
 function CMyTestCaseLuaCallCS.CaseGetType1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.LuaTestObj))
 	ASSERT_EQ(ret, "LuaTestObj")
 end
 
 function CMyTestCaseLuaCallCS.CaseGetType2(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.System.String))
 	ASSERT_EQ(ret, "System.String")
 end
 
 function CMyTestCaseLuaCallCS.CaseGetType3(self)
-    self.count = 1 + self.count
-    if CS.LuaTestCommon.IsXLuaGeneral() then return end
+	self.count = 1 + self.count
+	if CS.LuaTestCommon.IsXLuaGeneral() then return end
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.UnityEngine.Vector3))
 	ASSERT_EQ(ret, "UnityEngine.Vector3")
 end
 
 function CMyTestCaseLuaCallCS.CaseGetType4(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.System.Int16))
 	ASSERT_EQ(ret, "System.Int16")
 end
 
 function CMyTestCaseLuaCallCS.CaseGetType5(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.XLua.LuaTable))
 	ASSERT_EQ(ret, "XLua.LuaTable")
 end
 
 function CMyTestCaseLuaCallCS.CaseGetType6(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.XLua.LuaFunction))
 	ASSERT_EQ(ret, "XLua.LuaFunction")
 end
 
 --[[ v2.1.0版本中LuaUserData类已去掉
 function CMyTestCaseLuaCallCS.CaseGetType7(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.TestGetType(typeof(CS.XLua.LuaUserData))
 	ASSERT_EQ(ret, "XLua.LuaUserData")
 end
 ]]
 
 function CMyTestCaseLuaCallCS.Case64BitInt1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	CS.LuaTestObj.Gen64BitInt()
 	local x1 = CS.LuaTestObj.ulX1
 	local x2 = CS.LuaTestObj.ulX2
@@ -219,7 +219,7 @@ function CMyTestCaseLuaCallCS.Case64BitInt1(self)
 end
 
 function CMyTestCaseLuaCallCS.Case64BitInt2(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	CS.LuaTestObj.Gen64BitInt()
 	local x1 = CS.LuaTestObj.ulX1
 	local x2 = CS.LuaTestObj.ulX2
@@ -230,27 +230,27 @@ function CMyTestCaseLuaCallCS.Case64BitInt2(self)
 end
 
 function CMyTestCaseLuaCallCS.Case64BitInt3(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	CS.LuaTestObj.Gen64BitInt()
 	local y = CS.LuaTestObj.lY3
 	y = y * 100
 	ASSERT_EQ(tostring(y), "112589990684262400")
 	y = y / 10000
 	if islua53() then
-	    ASSERT_EQ(tostring(y), "11258999068426.0")
+		ASSERT_EQ(tostring(y), "11258999068426.0")
 	else
 		ASSERT_EQ(tostring(y), "11258999068426")
 	end
 	y = y % 1000
 	if islua53() then
-	    ASSERT_EQ(tostring(y), "426.240234375")
+		ASSERT_EQ(tostring(y), "426.240234375")
 	else
 		ASSERT_EQ(tostring(y), "426")
 	end
 end
 
 function CMyTestCaseLuaCallCS.Case64BitInt4(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	CS.LuaTestObj.Gen64BitInt()
 	local ret = CS.LuaTestObj.lY3 * CS.LuaTestObj.lY4
 	ASSERT_EQ(tostring(ret), "138485688541642752")
@@ -258,14 +258,14 @@ function CMyTestCaseLuaCallCS.Case64BitInt4(self)
 	if islua53() then
 		ASSERT_EQ(tostring(ret), "91202908614.226")
 	else
-	    ASSERT_EQ(tostring(ret), "91202908614")
+		ASSERT_EQ(tostring(ret), "91202908614")
 	end
 	ret = CS.LuaTestObj.lY3 % CS.LuaTestObj.lY6
 	ASSERT_EQ(tostring(ret), "52636")
 end
 
 function CMyTestCaseLuaCallCS.CaseCast1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local castObj = CS.TestCastClass()
 	cast(castObj, typeof(CS.TestCastClass))
 	ASSERT_EQ(true, castObj:TestFunc1())
@@ -320,8 +320,8 @@ function CMyTestCaseLuaCallCS.CaseDelgate1(self)
 	ret = luaDelgateLink(4)
 	ASSERT_EQ(1907, ret)
 	luaDelgateLink = luaDelgateLink - CS.LuaTestObj.csDelegate1
-    local ret, error = pcall(function() luaDelgateLink(5) end)
-    ASSERT_EQ(false, ret)
+	local ret, error = pcall(function() luaDelgateLink(5) end)
+	ASSERT_EQ(false, ret)
 
 	CS.LuaTestObj.initNumber = 5
 	luaDelgateLink = CS.LuaTestObj.csDelegate3
@@ -383,8 +383,8 @@ function CMyTestCaseLuaCallCS.CaseDelgate1(self)
 	ret = luaDelgateLink(7)
 	ASSERT_EQ(14, ret)
 	luaDelgateLink = luaDelgateLink - CS.LuaTestObj.csDelegate4
-    local ret, error = pcall(function() luaDelgateLink(8) end)
-    ASSERT_EQ(false, ret)
+	local ret, error = pcall(function() luaDelgateLink(8) end)
+	ASSERT_EQ(false, ret)
 end
 
 function EvtFunc11(y)
@@ -814,8 +814,8 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitExtensionMethodForClass(self)
 	self.count = 1 + self.count
-    local class = CS.TestChineseString()
-    class:PrintAllString()
+	local class = CS.TestChineseString()
+	class:PrintAllString()
 	
 	local length = class:GetLongStringLength()
 	ASSERT_EQ(54, length)
@@ -838,12 +838,12 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitExtensionMethodForStruct(self)
 	self.count = 1 + self.count
-    local employ_1 = CS.Employeestruct()
+	local employ_1 = CS.Employeestruct()
 	employ_1.Name = "HONGFANG"
 	employ_1.Age = 30
 	employ_1.Salary = 12000
 	employ_1.AnnualBonus = 30000
-    employ_1:PrintSalary()
+	employ_1:PrintSalary()
 	
 	local income = employ_1:GetIncomeForOneYear()
 	ASSERT_EQ(income, 174000)
@@ -853,7 +853,7 @@ function CMyTestCaseLuaCallCS.CaseVisitExtensionMethodForStruct(self)
 	employ_2.Age =25
 	employ_2.Salary = 5000
 	employ_2.AnnualBonus = 10000
-    employ_2:PrintSalary()
+	employ_2:PrintSalary()
 	
 	local cost = employ_1:Add(employ_2)
 	ASSERT_EQ(cost, 244000)	
@@ -863,7 +863,7 @@ function CMyTestCaseLuaCallCS.CaseVisitExtensionMethodForStruct(self)
 	employ_3.Age =25
 	employ_3.Salary = 5000
 	employ_3.AnnualBonus = 10000
-    employ_3:PrintSalary()
+	employ_3:PrintSalary()
 	
 	local ret1
 	local ret2
@@ -876,7 +876,7 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_1(self)
 	self.count = 1 + self.count
-    local struct_1 = CS.NoGenCodeStruct()
+	local struct_1 = CS.NoGenCodeStruct()
 	
 	local ret = struct_1:Add(2, 3)
 	struct_1.Byte = 10;
@@ -922,9 +922,9 @@ function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_1(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_2(self)
-    --2.struct作为类静态/成员属性
+	--2.struct作为类静态/成员属性
 	self.count = 1 + self.count
-    CS.NoGenCodeBaseClass.struct_var2 = CS.ConStruct(33333333, 44444444, "test") --分开赋值会失败
+	CS.NoGenCodeBaseClass.struct_var2 = CS.ConStruct(33333333, 44444444, "test") --分开赋值会失败
 	ASSERT_EQ(CS.NoGenCodeBaseClass.struct_var2.x, 33333333)
 	ASSERT_EQ(CS.NoGenCodeBaseClass.struct_var2.y, 44444444)
 	ASSERT_EQ(CS.NoGenCodeBaseClass.struct_var2.z, "test")
@@ -986,11 +986,11 @@ function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_2(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_3_5_9(self)
-    --3.struct作为类静态/成员方法输入
+	--3.struct作为类静态/成员方法输入
 	--5.struct作为类静态/成员方法输入输出，ref修饰
 	--9.struct作为重载方法的输入（in）,输出（out），输入输出（ref）
 	self.count = 1 + self.count
-    	
+		
 	local struct_1 = CS.NoGenCodeStruct()
 	
 	struct_1.Byte = 10;
@@ -1048,7 +1048,7 @@ function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_3_5_9(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_4(self)
-    --4.struct作为类静态/成员方法输出
+	--4.struct作为类静态/成员方法输出
 	self.count = 1 + self.count
 	
 	local class_1 = CS.NoGenCodeBaseClass();
@@ -1074,7 +1074,7 @@ function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_4(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_6(self)
-    --6.struct作为一个类静态/成员方法输出，修改属性后，并作为另一个类静态/成员方法输入
+	--6.struct作为一个类静态/成员方法输出，修改属性后，并作为另一个类静态/成员方法输入
 	self.count = 1 + self.count
 	
 	local class_1 = CS.NoGenCodeBaseClass();
@@ -1131,7 +1131,7 @@ function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_6(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitNoGenCodeStruct_7(self)
-    --7.struct作为父类静态/成员属性，lua中通过子类实例访问，包括获取和设置
+	--7.struct作为父类静态/成员属性，lua中通过子类实例访问，包括获取和设置
 	self.count = 1 + self.count
 	
 	local class_1 = CS.NoGenCodeDrivedClass();
@@ -1189,7 +1189,7 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitGenCodeStruct_10(self)
 	self.count = 1 + self.count
-    local struct_1 = CS.GenCodeStruct()
+	local struct_1 = CS.GenCodeStruct()
 	
 	local ret = struct_1:Add(2, 3)
 	struct_1.Byte = 10;
@@ -1228,7 +1228,7 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitGenCodeStruct_11(self)
 	self.count = 1 + self.count
-    	
+		
 	local ret = CS.GenCodeBaseClass.struct_var1:Add(2, 3)
 	ASSERT_EQ(CS.GenCodeBaseClass.GBS, 1)
 	CS.GenCodeBaseClass.GBS = 2;
@@ -1295,7 +1295,7 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitGenCodeStruct_12_14_18(self)
 	self.count = 1 + self.count
-    	
+		
 	local struct_1 = CS.GenCodeStruct()
 	
 	struct_1.Byte = 10;
@@ -1490,7 +1490,7 @@ function CMyTestCaseLuaCallCS.CaseVisitGenCodeStruct_17(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStruct_19(self)
-    --19.struct从反射接口返回，作为生成代码接口输入/输入输出
+	--19.struct从反射接口返回，作为生成代码接口输入/输入输出
 	self.count = 1 + self.count
 	
 	local class_1 = CS.NoGenCodeBaseClass();
@@ -1537,7 +1537,7 @@ function CMyTestCaseLuaCallCS.CaseVisitStruct_19(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStruct_20(self)
-    --20.struct从生成代码接口返回，作为反射接口输入/输入输出
+	--20.struct从生成代码接口返回，作为反射接口输入/输入输出
 	self.count = 1 + self.count
 	
 	local class_1 = CS.GenCodeBaseClass();
@@ -1582,7 +1582,7 @@ function CMyTestCaseLuaCallCS.CaseVisitStruct_20(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStruct_21(self)
-    --21.A继承B，B继承C， A,C生成代码，B不生成代码--->B也需要生成代码，或者A,B,C全部不生成代码
+	--21.A继承B，B继承C， A,C生成代码，B不生成代码--->B也需要生成代码，或者A,B,C全部不生成代码
 	self.count = 1 + self.count
 	
 	--22.A的实例访问B，C的struct类型属性
@@ -1615,13 +1615,13 @@ function CMyTestCaseLuaCallCS.CaseVisitStruct_21(self)
 	ASSERT_EQ(ret3.x, 2)
 	ASSERT_EQ(ret3.y, 1)
 	ASSERT_EQ(ret3.z, "heihei")
-    ASSERT_EQ(ret4.x, 4)
+	ASSERT_EQ(ret4.x, 4)
 	ASSERT_EQ(ret4.y, 3)
 	ASSERT_EQ(ret4.z, "TEST")
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStructVaribleParam(self)
-    --可变函数参数为struct
+	--可变函数参数为struct
 	self.count = 1 + self.count
 	
 	local struct_1 = CS.HasConstructStruct(2, 3, "TEST")
@@ -1633,7 +1633,7 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitFloat1(self)
 
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	
 	local struct_2 = CS.NoGen2FloatStruct(1.17549435e-38, 2.125)
 	ASSERT_EQ(string.sub(tostring(struct_2.a), 1, 10) , "1.17549435")
@@ -1642,7 +1642,7 @@ function CMyTestCaseLuaCallCS.CaseVisitFloat1(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStructFloat1(self)
-    --struct有2个float属性，不生成代码，会有精度损失
+	--struct有2个float属性，不生成代码，会有精度损失
 	self.count = 1 + self.count
 	
 	local struct_2 = CS.NoGen2FloatStruct(1.234, 2.125)
@@ -1805,7 +1805,7 @@ function CMyTestCaseLuaCallCS.CaseVisitStructFloatInClass(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitGenStructFloat1(self)
-    --struct有2个float属性，生成代码，会有精度损失
+	--struct有2个float属性，生成代码，会有精度损失
 	self.count = 1 + self.count
 	
 	local struct_2 = CS.Gen2FloatStruct(1.234, 2.125)
@@ -1842,7 +1842,7 @@ function CMyTestCaseLuaCallCS.CaseVisitGenStructFloat1(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStructInt1(self)
-    --struct有2个int属性，不生成代码
+	--struct有2个int属性，不生成代码
 	self.count = 1 + self.count
 	
 	local struct_2 = CS.NoGen2IntStruct(2, 3)
@@ -1851,7 +1851,7 @@ function CMyTestCaseLuaCallCS.CaseVisitStructInt1(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitStructIntString1(self)
-    --struct有2个int属性， 1个string属性，不生成代码
+	--struct有2个int属性， 1个string属性，不生成代码
 	self.count = 1 + self.count
 	
 	local struct_2 = CS.ConStruct(2, 3, "haha")
@@ -1930,7 +1930,7 @@ end
 
 function CMyTestCaseLuaCallCS.CaseVisitStaticPusherStruct_1(self)
 	self.count = 1 + self.count
-    local struct_1 = CS.StaticPusherStructA(97, -100)
+	local struct_1 = CS.StaticPusherStructA(97, -100)
 	local struct_2 = CS.StaticPusherStructB(-32525, 65535, -2147483647, 4294967295)
 	ASSERT_EQ(struct_1.byteVar, 97)
 	ASSERT_EQ(struct_1.sbyteVar, -100)
@@ -2057,20 +2057,20 @@ function CMyTestCaseLuaCallCS.CaseVisitStaticPusherStruct_1(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseGetStaticSum(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.Sum(1, 2)
 	ASSERT_EQ(ret, 3)
 end
 
 function CMyTestCaseLuaCallCS.CaseGetSum(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.LuaTestObj()
 	local ret = class:Sum(1, 2, 6)
 	ASSERT_EQ(ret, 9)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitTemplateMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	ASSERT_EQ(CS.EmployeeTemplate.GetBasicSalary, nil)
 	ASSERT_EQ(CS.EmployeeTemplate.AddBonus, nil)
 	local class = CS.Manager()
@@ -2084,24 +2084,24 @@ function CMyTestCaseLuaCallCS.CaseVisitGenericMethod(self)
 	if (true) then
 		local ret, error = pcall(function() class:GenericMethod(a) end)
 		ASSERT_EQ(ret, false)
-    else
-        ASSERT_EQ(true, false)
+	else
+		ASSERT_EQ(true, false)
 	end
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitIntPtr(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.LuaTestObj()
 	local ptr = class.ptr
 	print(ptr)
 	local ptr1 = class:GetPtr()
-    print(ptr1)
-    local bytevar = class:PrintPtr(ptr1)
+	print(ptr1)
+	local bytevar = class:PrintPtr(ptr1)
 	ASSERT_EQ(bytevar, 97)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitVarAndDefaultFunc1(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.LuaTestObj()
 
 	local ret = class:VariableParamFuncDefault(1)
@@ -2112,7 +2112,7 @@ function CMyTestCaseLuaCallCS.CaseVisitVarAndDefaultFunc1(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVisitVarAndDefaultFunc2(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.LuaTestObj()
 
 	local ret = class:VariableParamFuncDefault(1, 2, "john", "che")
@@ -2123,35 +2123,35 @@ function CMyTestCaseLuaCallCS.CaseVisitVarAndDefaultFunc2(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncReturnByteArray(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 
 	local ret = CS.LuaTestObj.FuncReturnByteArray()
 	ASSERT_EQ(ret, "abc")
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncReturnByte(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 
 	local ret = CS.LuaTestObj.FuncReturnByte()
 	ASSERT_EQ(ret, 97)
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncReturnIntArray(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 
 	local ret = CS.LuaTestObj.FuncReturnIntArray()
 	ASSERT_EQ(type(ret), "userdata")
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncReturnInt(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	
 	local ret = CS.LuaTestObj.FuncReturnInt()
 	ASSERT_EQ(ret, 97)
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncUint64Tostring(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local uint64Var = 1234567890
 	local ret = uint64.tostring(uint64Var)
 	ASSERT_EQ(ret, "1234567890")
@@ -2166,7 +2166,7 @@ function CMyTestCaseLuaCallCS.CaseFuncUint64Tostring(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncUint64divide(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local uint64Var = 1234567890
 	local ret = uint64.divide(uint64Var, 10)
 	ASSERT_EQ(tostring(ret), "123456789")
@@ -2181,13 +2181,13 @@ function CMyTestCaseLuaCallCS.CaseFuncUint64divide(self)
 	if (true) then
 		local ret, error = pcall(function() uint64.divide(CS.LongStatic.ULONG_MAX, 0) end)
 		ASSERT_EQ(ret, false)
-    else
-        ASSERT_EQ(true, false)
+	else
+		ASSERT_EQ(true, false)
 	end
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncUint64compare(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local uint64Var = 1234567890
 	local ret = uint64.compare(uint64Var, uint64Var)
 	ASSERT_EQ(ret, 0)
@@ -2202,7 +2202,7 @@ function CMyTestCaseLuaCallCS.CaseFuncUint64compare(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseFuncUint64remainder(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local uint64Var = 1234567890
 	local ret = uint64.remainder(uint64Var, uint64Var)
 	ASSERT_EQ(tostring(ret), "0")
@@ -2217,13 +2217,13 @@ function CMyTestCaseLuaCallCS.CaseFuncUint64remainder(self)
 	if (true) then
 		local ret, error = pcall(function() uint64.remainder(CS.LongStatic.ULONG_MAX, 0) end)
 		ASSERT_EQ(ret, false)
-    else
-        ASSERT_EQ(true, false)
+	else
+		ASSERT_EQ(true, false)
 	end
 end
 
 function CMyTestCaseLuaCallCS.CaseTableAutoTransSimpleClassMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.TestTableAutoTransClass()
 	local ret = class:SimpleClassMethod({x=97, y="123", z=100000000000})
 	ASSERT_EQ(ret.x, 97)
@@ -2232,7 +2232,7 @@ function CMyTestCaseLuaCallCS.CaseTableAutoTransSimpleClassMethod(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseTableAutoTransComplexClassMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.TestTableAutoTransClass()
 	local ret = class:ComplexClassMethod({A=97, B={x=97, y="123", z=100000000000}})
 	ASSERT_EQ(ret.IntVar, 97)
@@ -2242,14 +2242,14 @@ function CMyTestCaseLuaCallCS.CaseTableAutoTransComplexClassMethod(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseTableAutoTransSimpleStructMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.TestTableAutoTransClass()
 	local ret = class:SimpleStructMethod({a=97})
 	ASSERT_EQ(ret.a, 97)
 end
 
 function CMyTestCaseLuaCallCS.CaseTableAutoTransComplexStructMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.TestTableAutoTransClass()
 	local ret = class:ComplexStructMethod({a=-101, b=1000, c=1.000000132, d={a=97}})
 	ASSERT_EQ(ret.a, -101)
@@ -2259,14 +2259,14 @@ function CMyTestCaseLuaCallCS.CaseTableAutoTransComplexStructMethod(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseTableAutoTransOneListMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.TestTableAutoTransClass()
 	local ret = class:OneListMethod({1, 2, 3, 4, 5})
 	ASSERT_EQ(ret, 15)
 end
 
 function CMyTestCaseLuaCallCS.CaseTableAutoTransTwoDimensionListMethod(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local class = CS.TestTableAutoTransClass()
 	local ret = class:TwoDimensionListMethod({{1, 2, 3},{4, 5, 6}})
 	ASSERT_EQ(ret, 21)
@@ -2274,20 +2274,20 @@ end
 
 function CMyTestCaseLuaCallCS.CaseTestImplicit(self)
 	self.count = 1 + self.count
-    if CS.LuaTestCommon.IsXLuaGeneral() then return end
+	if CS.LuaTestCommon.IsXLuaGeneral() then return end
 	local ret = CS.LuaTestObj.TestImplicit():GetType()
 	ASSERT_EQ(ret, typeof(CS.UnityEngine.LayerMask))
 end
 
 function CMyTestCaseLuaCallCS.CaseVariableParamFunc2_1_4(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret, err = pcall(function() CS.LuaTestObj.VariableParamFunc(0, CS.LuaTestObj()) end)
 	ASSERT_EQ(ret, false)
 	ASSERT_TRUE(err:find("invalid arguments"))
 end
 
 function CMyTestCaseLuaCallCS.CaseFirstPushEnum(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.FirstPushEnumFunc(1)
 	ASSERT_EQ(ret, "1")
 	local ret = CS.LuaTestObj.FirstPushEnumFunc(2)
@@ -2312,7 +2312,7 @@ function CMyTestCaseLuaCallCS.CaseReferTestClass(self)
 end
 
 function CMyTestCaseLuaCallCS.CaseVariableParamFuncNoParam(self)
-    self.count = 1 + self.count
+	self.count = 1 + self.count
 	local ret = CS.LuaTestObj.VariableParamFunc2()
 	ASSERT_EQ(ret, 0)
 	local ret = CS.LuaTestObj.VariableParamFunc2("abc", "haha")
