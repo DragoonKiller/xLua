@@ -119,7 +119,7 @@ namespace CSObjectWrapEditor
             
             templateRef = new XLuaTemplates();
 #if GEN_CODE_MINIMIZE
-            templateRef.LuaClassWrap = { name = template_ref.LuaClassWrapGCM.name, text = template_ref.LuaClassWrapGCM.text },
+            templateRef.LuaClassWrap = new XLuaTemplate { name = template_ref.LuaClassWrapGCM.name, text = template_ref.LuaClassWrapGCM.text };
 #else
             templateRef.LuaClassWrap = new XLuaTemplate { name = template_ref.LuaClassWrap.name, text = template_ref.LuaClassWrap.text };
 #endif

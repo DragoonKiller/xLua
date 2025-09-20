@@ -91,6 +91,11 @@ namespace XLua
 
         public CodeEmit()
         {
+			var objTranslatorType = typeof(ObjectTranslator);
+			var objTranslatorInstanceProperty = objTranslatorType.GetProperty("instance", BindingFlags.Public | BindingFlags.Static);
+			ObjectTranslatorPool_FindTranslator = objTranslatorInstanceProperty.GetGetMethod();
+			UnityEngine.Debug.Assert(ObjectTranslatorPool_FindTranslator != null, "ObjectTranslatorPool_FindTranslator is null");
+			
             var builder = ImmutableDictionary.CreateBuilder<Type, MethodInfo>();
             builder.Add(typeof(byte), LuaAPI_xlua_pushinteger);
             builder.Add(typeof(char), LuaAPI_xlua_pushinteger);
@@ -904,7 +909,7 @@ namespace XLua
             il.Emit(OpCodes.Ret);
         }
 
-        private MethodInfo ObjectTranslatorPool_FindTranslator = typeof(ObjectTranslatorPool).GetMethod("FindTranslator");
+        private MethodInfo ObjectTranslatorPool_FindTranslator;
         private Type[] parameterTypeOfWrap = new Type[] { typeof(RealStatePtr) };
         private MethodInfo ObjectTranslator_Assignable = typeof(ObjectTranslator).GetMethod("Assignable", new Type[] { typeof(RealStatePtr),
                typeof(int), typeof(Type)});
@@ -990,7 +995,7 @@ namespace XLua
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Stloc, L);
 
-            il.Emit(OpCodes.Ldarg_0);
+            // il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, ObjectTranslatorPool_FindTranslator);
             il.Emit(OpCodes.Stloc, translator);
 
@@ -1067,7 +1072,7 @@ namespace XLua
             il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Stloc, L);
 
-            il.Emit(OpCodes.Ldarg_0);
+            // il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, ObjectTranslatorPool_FindTranslator);
             il.Emit(OpCodes.Stloc, translator);
 
@@ -1245,7 +1250,7 @@ namespace XLua
 
             LocalBuilder translator = il.DeclareLocal(typeof(ObjectTranslator));
 
-            il.Emit(OpCodes.Ldarg_0);
+            // il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, ObjectTranslatorPool_FindTranslator);
             il.Emit(OpCodes.Stloc, translator);
 
@@ -1486,7 +1491,7 @@ namespace XLua
             Label exceptionBlock = il.BeginExceptionBlock();
             Label retPoint = il.DefineLabel();
 
-            il.Emit(OpCodes.Ldarg_0);
+            // il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, ObjectTranslatorPool_FindTranslator);
             il.Emit(OpCodes.Stloc, translator);
 
@@ -1627,7 +1632,7 @@ namespace XLua
 
             Label exceptionBlock = il.BeginExceptionBlock();
             Label retPoint = il.DefineLabel();
-            il.Emit(OpCodes.Ldarg_0);
+            // il.Emit(OpCodes.Ldarg_0);
             il.Emit(OpCodes.Call, ObjectTranslatorPool_FindTranslator);
             il.Emit(OpCodes.Stloc, translator);
 

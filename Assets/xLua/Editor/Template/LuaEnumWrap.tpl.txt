@@ -31,7 +31,7 @@ namespace XLua.CSObjectWrap
     {
 		public static void __Register(RealStatePtr L)
         {
-		    ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+		    ObjectTranslator translator = ObjectTranslator.instance;
 		    Utils.BeginObjectRegister(typeof(<%=CsFullTypeName(type)%>), L, translator, 0, 0, 0, 0);
 			Utils.EndObjectRegister(typeof(<%=CsFullTypeName(type)%>), L, translator, null, null, null, null, null);
 			
@@ -53,7 +53,7 @@ namespace XLua.CSObjectWrap
 		[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int __CastFrom(RealStatePtr L)
 		{
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectTranslator translator = ObjectTranslator.instance;
 			LuaTypes lua_type = LuaAPI.lua_type(L, 1);
             if (lua_type == LuaTypes.LUA_TNUMBER)
             {

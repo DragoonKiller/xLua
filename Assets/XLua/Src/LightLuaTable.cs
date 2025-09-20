@@ -81,11 +81,11 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
     {
         // Debug.LogWarning("create t" + LuaExecutor.frameCount);
         using var _ = LuaUtils.CallNative(out var L);
-        LuaAPI.lua_newtable(L);
-        int udata = LuaAPI.xlua_tocsobj_safe(L, -1);
-        Debug.Assert(udata == -1);
-        LuaAPI.lua_pushvalue(L, -1);
+        // stack: <none>
+		LuaAPI.lua_newtable(L);
+		// stack: <none>, newTable
         var r = LuaAPI.luaL_ref(L);
+		
         return new LightLuaTable(vm, r, backref);
     }
     

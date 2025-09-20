@@ -27,6 +27,7 @@ namespace XLua
     using Prota;
     using UnityEngine;
     using Unity.Jobs.LowLevel.Unsafe;
+    using System.Runtime.Serialization;
 
     class ReferenceEqualsComparer : IEqualityComparer<object>
     {
@@ -104,8 +105,10 @@ namespace XLua
     public delegate int CSharpWrapper(IntPtr L, int top);
 #endif
 
-    public partial class ObjectTranslator
+    public partial class ObjectTranslator : IDisposable
 	{
+		public static ObjectTranslator instance { get; set; } = default;
+		
         public static bool disableGenWarning = false;
         
         internal MethodWrapsCache methodWrapsCache;
@@ -164,7 +167,7 @@ namespace XLua
                 else
                 {
                     Utils.ReflectionWrap(L, type, privateAccessibleFlags.Contains(type));
-                }
+                } 
 #else
                 Utils.ReflectionWrap(L, type, privateAccessibleFlags.Contains(type));
 #endif
@@ -223,8 +226,12 @@ namespace XLua
             }
         }
 
-        public ObjectTranslator(LuaEnv luaenv,RealStatePtr L)
+        public ObjectTranslator(LuaEnv luaEnv, RealStatePtr L)
 		{
+			if(instance != null) throw new Exception("ObjectTranslator already exists, there should be only one instance at the same time");
+			instance = this;
+			
+			
 #if XLUA_GENERAL  || (UNITY_WSA && !UNITY_EDITOR)
             var dumb_field = typeof(ObjectTranslator).GetField("s_gen_reg_dumb_obj", BindingFlags.Static| BindingFlags.DeclaredOnly | BindingFlags.NonPublic);
             if (dumb_field != null)
@@ -251,11 +258,11 @@ namespace XLua
                 }
             }
 
-            this.luaEnv=luaenv;
+            this.luaEnv = luaEnv;
             objectCasters = new ObjectCasters(this);
             objectCheckers = new ObjectCheckers(this);
             methodWrapsCache = new MethodWrapsCache(this, objectCheckers, objectCasters);
-			metaFunctions=new StaticLuaCallbacks();
+			metaFunctions = new StaticLuaCallbacks();
 
             importTypeFunction = new LuaCSFunction(StaticLuaCallbacks.ImportType);
             loadAssemblyFunction = new LuaCSFunction(StaticLuaCallbacks.LoadAssembly);
@@ -351,6 +358,7 @@ namespace XLua
 #if (UNITY_EDITOR || XLUA_GENERAL) && !NET_STANDARD_2_0
         CodeEmit ce = new CodeEmit();
 #endif
+
         MethodInfo[] genericAction = null;
         MethodInfo[] genericFunc = null;
         Dictionary<Type, Func<DelegateBridgeBase, Delegate>> delegateCreatorCache
@@ -609,16 +617,16 @@ namespace XLua
 
             if (!interfaceBridgeCreators.TryGetValue(interfaceType, out creator))
             {
-#if (UNITY_EDITOR || XLUA_GENERAL) && !NET_STANDARD_2_0
-                var bridgeType = ce.EmitInterfaceImpl(interfaceType);
-                creator = (int reference, LuaEnv luaenv) =>
-                {
-                    return Activator.CreateInstance(bridgeType, new object[] { reference, luaEnv }) as LuaBase;
-                };
-                interfaceBridgeCreators.Add(interfaceType, creator);
-#else
+// #if (UNITY_EDITOR || XLUA_GENERAL) && !NET_STANDARD_2_0
+                // var bridgeType = ce.EmitInterfaceImpl(interfaceType);
+                // creator = (int reference, LuaEnv luaenv) =>
+                // {
+                //     return Activator.CreateInstance(bridgeType, new object[] { reference, luaEnv }) as LuaBase;
+                // };
+                // interfaceBridgeCreators.Add(interfaceType, creator);
+// #else
                 throw new InvalidCastException("This type must add to CSharpCallLua: " + interfaceType);
-#endif
+// #endif
             }
             LuaAPI.lua_pushvalue(L, idx);
             return creator(LuaAPI.luaL_ref(L), luaEnv);
@@ -1780,6 +1788,32 @@ namespace XLua
             {
                 throw new Exception("invalid lua value for decimal, LuaType=" + lua_type);
             }
+        }
+
+        private bool disposed = false;
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+				// 清理静态实例引用
+				if (instance == this)
+				{
+					instance = null;
+				}
+                disposed = true;
+            }
+        }
+
+        ~ObjectTranslator()
+        {
+            Dispose(false);
         }
     }
 }

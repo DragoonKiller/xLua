@@ -106,7 +106,7 @@ namespace XLua
                 translator = new ObjectTranslator(this, rawL);
                 translator.createFunctionMetatable(rawL);
                 translator.OpenLib(rawL);
-                ObjectTranslatorPool.Instance.Add(rawL, translator);
+                // ObjectTranslatorPool.Instance.Add(rawL, translator);
 
                 LuaAPI.lua_atpanic(rawL, StaticLuaCallbacks.Panic);
 
@@ -413,7 +413,7 @@ namespace XLua
             System.GC.WaitForPendingFinalizers();
         }
 
-        public virtual void Dispose(bool dispose)
+        public virtual void Dispose(bool disposing)
         {
 #if THREAD_SAFE || HOTFIX_ENABLE
             lock (luaEnvLock)
@@ -427,8 +427,8 @@ namespace XLua
                     throw new InvalidOperationException("try to dispose a LuaEnv with C# callback!");
                 }
                 
-                ObjectTranslatorPool.Instance.Remove(L);
-
+				translator.Dispose();
+				
                 LuaAPI.lua_close(L);
                 translator = null;
 
@@ -439,6 +439,11 @@ namespace XLua
             }
 #endif
         }
+		
+		~LuaEnv()
+		{
+			Dispose(false);
+		}
 
         public void ThrowExceptionFromError(int oldTop)
         {

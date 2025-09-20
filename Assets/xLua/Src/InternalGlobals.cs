@@ -33,7 +33,7 @@ namespace XLua
         internal static volatile TryArrayGet genTryArrayGetPtr = null;
         internal static volatile TryArraySet genTryArraySetPtr = null;
 
-        internal static volatile ObjectTranslatorPool objectTranslatorPool = new ObjectTranslatorPool();
+        // internal static volatile ObjectTranslatorPool objectTranslatorPool = new ObjectTranslatorPool();
 
         internal static volatile int LUA_REGISTRYINDEX = -10000;
 

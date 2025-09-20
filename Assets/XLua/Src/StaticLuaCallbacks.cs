@@ -48,7 +48,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 object left = translator.FastGetCSObj(L, 1);
                 object right = translator.FastGetCSObj(L, 2);
                 Type typeOfLeft = left.GetType();
@@ -70,7 +70,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 object left = translator.FastGetCSObj(L, 1);
                 object right = translator.FastGetCSObj(L, 2);
                 Type typeOfLeft = left.GetType();
@@ -92,7 +92,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 LuaCSFunction func = (LuaCSFunction)translator.FastGetCSObj(L, LuaAPI.xlua_upvalueindex(1));
                 return func(L);
             }
@@ -113,7 +113,7 @@ namespace XLua
             
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 int idx = LuaAPI.xlua_tointeger(L, LuaAPI.xlua_upvalueindex(1));
                 LuaCSFunction func = (LuaCSFunction)translator.GetFixCSFunction(idx);
                 return func(L);
@@ -130,7 +130,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 return translator.CallCSharpWrapper(L, funcidx, top);
             }
             catch (Exception e)
@@ -149,7 +149,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 object objDelegate = translator.FastGetCSObj(L, 1);
                 if (objDelegate == null || !(objDelegate is Delegate))
                 {
@@ -171,7 +171,7 @@ namespace XLua
                 int udata = LuaAPI.xlua_tocsobj_safe(L, 1);
                 if (udata != -1)
                 {
-                    ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                    ObjectTranslator translator = ObjectTranslator.instance;
                     if ( translator != null )
                     {
                         translator.collectObject(udata);
@@ -190,7 +190,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 object obj = translator.FastGetCSObj(L, 1);
                 translator.PushAny(L, obj != null ? (obj.ToString() + ": " + obj.GetHashCode()) : "<invalid c# object>");
                 return 1;
@@ -210,7 +210,7 @@ namespace XLua
         {
             try
             {
-                var translator = ObjectTranslatorPool.Instance.Find(L);
+                var translator = ObjectTranslator.instance;
                 Type type = translator.FastGetCSObj(L, LuaAPI.lua_type(L, 1) == LuaTypes.LUA_TUSERDATA ? 1 : 2).GetType();
                 Delegate d1 = translator.GetObject(L, 1, type) as Delegate;
                 Delegate d2 = translator.GetObject(L, 2, type) as Delegate;
@@ -236,7 +236,7 @@ namespace XLua
         {
             try
             {
-                var translator = ObjectTranslatorPool.Instance.Find(L);
+                var translator = ObjectTranslator.instance;
                 Delegate d1 = translator.FastGetCSObj(L, 1) as Delegate;
                 if (d1 == null)
                 {
@@ -323,7 +323,7 @@ namespace XLua
             else if (type == typeof(decimal[]))
             {
                 decimal[] array = obj as decimal[];
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 translator.PushDecimal(L, array[index]);
             }
             else if (type == typeof(string[]))
@@ -347,7 +347,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 System.Array array = (System.Array)translator.FastGetCSObj(L, 1);
 
                 if (array == null)
@@ -471,7 +471,7 @@ namespace XLua
 
                 if (lua_type == LuaTypes.LUA_TUSERDATA)
                 {
-                    ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                    ObjectTranslator translator = ObjectTranslator.instance;
                     if (translator.IsDecimal(L, obj_idx))
                     {
                         translator.Get(L, obj_idx, out array[array_idx]);
@@ -507,7 +507,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 System.Array array = (System.Array)translator.FastGetCSObj(L, 1);
 
                 if (array == null)
@@ -563,7 +563,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 System.Array array = (System.Array)translator.FastGetCSObj(L, 1);
                 LuaAPI.xlua_pushinteger(L, array.Length);
                 return 1;
@@ -579,7 +579,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type = translator.FastGetCSObj(L, 2) as Type;
                 if (type == null)
                 {
@@ -667,7 +667,7 @@ namespace XLua
             {
                 string builtin_lib = LuaAPI.lua_tostring(L, 1);
 
-                LuaEnv self = ObjectTranslatorPool.Instance.Find(L).luaEnv;
+                LuaEnv self = ObjectTranslator.instance.luaEnv;
 
                 LuaCSFunction initer;
 
@@ -786,7 +786,7 @@ namespace XLua
             {
                 string filename = LuaAPI.lua_tostring(L, 1);
 
-                LuaEnv self = ObjectTranslatorPool.Instance.Find(L).luaEnv;
+                LuaEnv self = ObjectTranslator.instance.luaEnv;
 
                 foreach (var loader in self.customLoaders)
                 {
@@ -820,7 +820,7 @@ namespace XLua
 #else
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 string assemblyName = LuaAPI.lua_tostring(L, 1);
 
                 Assembly assembly = null;
@@ -858,7 +858,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 string className = LuaAPI.lua_tostring(L, 1);
                 Type type = translator.FindType(className);
                 if (type != null)
@@ -891,7 +891,7 @@ namespace XLua
             {
                 int top = LuaAPI.lua_gettop(L);
                 if (top < 2) return LuaAPI.luaL_error(L, "import generic type need at lease 2 arguments");
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 string className = LuaAPI.lua_tostring(L, 1);
                 if (className.EndsWith("<>")) className = className.Substring(0, className.Length - 2);
                 Type genericDef = translator.FindType(className + "`" + (top - 1));
@@ -929,7 +929,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type;
                 translator.Get(L, 2, out type);
 
@@ -979,7 +979,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type = getType(L, translator, 1);
                 object obj = null;
                 if (type == null && LuaAPI.lua_type(L, 1) == LuaTypes.LUA_TUSERDATA)
@@ -1044,7 +1044,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type = getType(L, translator, 1); ;
                 if (type == null)
                 {
@@ -1069,7 +1069,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type = getType(L, translator, 1);
                 if (type == null)
                 {
@@ -1113,7 +1113,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type = getType(L, translator, 1);
                 if (type == null || !typeof(Delegate).IsAssignableFrom(type))
                 {
@@ -1133,7 +1133,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 MethodBase m;
                 translator.Get(L, 1, out m);
                 if (m == null)
@@ -1155,7 +1155,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 MethodInfo genericMethod;
                 translator.Get(L, LuaAPI.xlua_upvalueindex(1), out genericMethod);
                 int n = LuaAPI.lua_gettop(L);
@@ -1185,7 +1185,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 Type type = getType(L, translator, 1);
                 if (type == null)
                 {
@@ -1235,7 +1235,7 @@ namespace XLua
         {
             try
             {
-                ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+                ObjectTranslator translator = ObjectTranslator.instance;
                 translator.ReleaseCSObj(L, 1);
                 return 0;
             }

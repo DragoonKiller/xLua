@@ -148,7 +148,7 @@ namespace XLua
 			{
 				return (RealStatePtr L) =>
 				{
-					ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+					ObjectTranslator translator = ObjectTranslator.instance;
 					translator.PushAny(L, field.GetValue(null));
 					return 1;
 				};
@@ -157,7 +157,7 @@ namespace XLua
 			{
 				return (RealStatePtr L) =>
 				{
-					ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+					ObjectTranslator translator = ObjectTranslator.instance;
 					object obj = translator.FastGetCSObj(L, 1);
 					if (obj == null || !type.IsInstanceOfType(obj))
 					{
@@ -176,7 +176,7 @@ namespace XLua
 			{
 				return (RealStatePtr L) =>
 				{
-					ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+					ObjectTranslator translator = ObjectTranslator.instance;
 					object val = translator.GetObject(L, 1, field.FieldType);
 					if (field.FieldType.IsValueType() && Nullable.GetUnderlyingType(field.FieldType) == null && val == null)
 					{
@@ -190,7 +190,7 @@ namespace XLua
 			{
 				return (RealStatePtr L) =>
 				{
-					ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+					ObjectTranslator translator = ObjectTranslator.instance;
 
 					object obj = translator.FastGetCSObj(L, 1);
 					if (obj == null || !type.IsInstanceOfType(obj))
@@ -228,7 +228,7 @@ namespace XLua
 			object[] arg = new object[1] { null };
 			return (RealStatePtr L) =>
 			{
-				ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+				ObjectTranslator translator = ObjectTranslator.instance;
 				object obj = translator.FastGetCSObj(L, 1);
 				if (obj == null || !type.IsInstanceOfType(obj))
 				{
@@ -280,7 +280,7 @@ namespace XLua
 			object[] arg = new object[1] { null };
 			return (RealStatePtr L) =>
 			{
-				ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+				ObjectTranslator translator = ObjectTranslator.instance;
 				object obj = translator.FastGetCSObj(L, 1);
 				if (obj == null || !type.IsInstanceOfType(obj))
 				{
@@ -327,7 +327,7 @@ namespace XLua
 			{
 				try
 				{
-					ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+					ObjectTranslator translator = ObjectTranslator.instance;
 					return translator.TranslateToEnumToTop(L, type, 1);
 				}
 				catch (Exception e)
@@ -411,7 +411,7 @@ namespace XLua
 		static void makeReflectionWrap(RealStatePtr L, Type type, int cls_field, int cls_getter, int cls_setter,
 			int obj_field, int obj_getter, int obj_setter, int obj_meta, out LuaCSFunction item_getter, out LuaCSFunction item_setter, BindingFlags access)
 		{
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectTranslator translator = ObjectTranslator.instance;
 			BindingFlags flag = BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | access;
 			FieldInfo[] fields = type.GetFields(flag);
 			EventInfo[] all_events = type.GetEvents(flag | BindingFlags.Public | BindingFlags.NonPublic);
@@ -591,7 +591,7 @@ namespace XLua
 
 		public static void loadUpvalue(RealStatePtr L, Type type, string metafunc, int index)
 		{
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectTranslator translator = ObjectTranslator.instance;
 			LuaAPI.xlua_pushasciistring(L, metafunc);
 			LuaAPI.lua_rawget(L, LuaIndexes.LUA_REGISTRYINDEX);
 			translator.Push(L, type);
@@ -616,7 +616,7 @@ namespace XLua
 
         public static void RegisterEnumType(RealStatePtr L, Type type)
         {
-            ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            ObjectTranslator translator = ObjectTranslator.instance;
             foreach (var name in Enum.GetNames(type))
             {
                 RegisterObject(L, translator, Utils.CLS_IDX, name, Enum.Parse(type, name));
@@ -673,7 +673,7 @@ namespace XLua
 				{
 					continue;
 				}
-				ObjectTranslatorPool.Instance.Find(L).TryDelayWrapLoader(L, nested_type);
+				ObjectTranslator.instance.TryDelayWrapLoader(L, nested_type);
 				MakePrivateAccessible(L, nested_type);
 			}
 		}
@@ -683,7 +683,7 @@ namespace XLua
 		{
 			try
 			{
-				ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+				ObjectTranslator translator = ObjectTranslator.instance;
 				Type type;
 				translator.Get(L, LuaAPI.xlua_upvalueindex(1), out type);
 				LazyMemberTypes memberType = (LazyMemberTypes)LuaAPI.xlua_tointeger(L, LuaAPI.xlua_upvalueindex(2));
@@ -834,7 +834,7 @@ namespace XLua
             LuaAPI.lua_checkstack(L, 20);
 
             int top_enter = LuaAPI.lua_gettop(L);
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectTranslator translator = ObjectTranslator.instance;
 			//create obj meta table
 			LuaAPI.luaL_getmetatable(L, type.FullName);
 			if (LuaAPI.lua_isnil(L, -1))
@@ -1170,7 +1170,7 @@ namespace XLua
 #if GEN_CODE_MINIMIZE
         public static void RegisterFunc(RealStatePtr L, int idx, string name, CSharpWrapper func)
         {
-            ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+            ObjectTranslator translator = ObjectTranslator.instance;
             idx = abs_idx(LuaAPI.lua_gettop(L), idx);
             LuaAPI.xlua_pushasciistring(L, name);
             translator.PushCSharpWrapper(L, func);
@@ -1191,7 +1191,7 @@ namespace XLua
 			idx = abs_idx(LuaAPI.lua_gettop(L), idx);
 			LuaAPI.xlua_pushasciistring(L, name);
 
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectTranslator translator = ObjectTranslator.instance;
 			translator.PushAny(L, type);
 			LuaAPI.xlua_pushinteger(L, (int)memberType);
 			LuaAPI.lua_pushstring(L, name);
@@ -1216,7 +1216,7 @@ namespace XLua
 			int static_getter_count, int static_setter_count)
 #endif
 		{
-			ObjectTranslator translator = ObjectTranslatorPool.Instance.Find(L);
+			ObjectTranslator translator = ObjectTranslator.instance;
 			LuaAPI.lua_createtable(L, 0, class_field_count);
 
 			LuaAPI.xlua_pushasciistring(L, "UnderlyingSystemType");
@@ -1404,7 +1404,7 @@ namespace XLua
 
             LuaAPI.xlua_pushasciistring(L, LuaEnv.CSHARP_NAMESPACE);
             LuaAPI.lua_rawget(L, LuaIndexes.LUA_REGISTRYINDEX);
-            ObjectTranslatorPool.Instance.Find(L).PushAny(L, type);
+            ObjectTranslator.instance.PushAny(L, type);
 			LuaAPI.lua_pushvalue(L, cls_table);
 			LuaAPI.lua_rawset(L, -3);
 			LuaAPI.lua_pop(L, 1);
