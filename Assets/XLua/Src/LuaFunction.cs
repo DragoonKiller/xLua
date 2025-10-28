@@ -399,6 +399,11 @@ namespace XLua
         {
             LuaAPI.lua_getref(L, luaReference);
         }
+		
+		public void push()
+		{
+			LuaAPI.lua_getref(luaEnv.rawL, luaReference);
+		}
 
         public override string ToString()
         {

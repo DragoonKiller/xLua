@@ -92,19 +92,9 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
     public void Dispose()
     {
         if(!valid) return;
-        // Debug.LogWarning("dispose" + LuaExecutor.frameCount);
-        env.translator.ReleaseLuaBase(env.L, reference, false);
-        this.reference = 0;
-        // RemoveRecord();
+        LuaAPI.lua_unref(env.L, reference);
+		this.reference = 0;
     }
-    
-    // public static void LogRecord()
-    // {
-    //     foreach (var item in debugList.OrderBy(a => a.Value))
-    //     {
-    //         Debug.Log($"[{item.Value}]:{item.Key}");
-    //     }
-    // }
     
     public void push() => LuaAPI.lua_getref(env.L, reference);
     
@@ -142,6 +132,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);          // stack: table, key
+		var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void SetNil(float key)
@@ -150,6 +142,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushnumber(L, key);          // stack: table, key
+		var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void SetNil(long key)
@@ -158,6 +152,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushint64(L, key);          // stack: table, key
+		var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void SetNil(bool key)
@@ -166,6 +162,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         using var _ = LuaUtils.CallNative(out var L);
         push();                                 // stack: table
         LuaAPI.lua_pushboolean(L, key);          // stack: table, key
+		var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     
@@ -176,7 +174,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         LuaAPI.xlua_pushinteger(L, value);         // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(string key, float value)
@@ -186,7 +185,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         LuaAPI.lua_pushnumber(L, value);        // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(string key, string value)
@@ -196,7 +196,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         LuaAPI.lua_pushstring(L, value);        // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(string key, bool value)
@@ -206,7 +207,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         LuaAPI.lua_pushboolean(L, value);       // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set<T>(string key, T value)
@@ -216,7 +218,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         env.translator.PushByType(L, value);     // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(string key, IntPtr value)
@@ -226,7 +229,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         LuaAPI.lua_pushlightuserdata(L, value);     // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
 	}
 	
     public void Set(string key, LightLuaTable t)
@@ -237,7 +241,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         LuaAPI.lua_getref(L, t.reference);      // stack: table, key, table
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(string key, LuaTable t)
@@ -248,7 +253,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.lua_pushstring(L, key);          // stack: table, key
         t.push(L);                              // stack: table, key, table
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(int key, int value)
@@ -258,7 +264,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         LuaAPI.xlua_pushinteger(L, value);         // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(int key, float value)
@@ -268,7 +275,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         LuaAPI.lua_pushnumber(L, value);        // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(int key, string value)
@@ -278,7 +286,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         LuaAPI.lua_pushstring(L, value);        // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(int key, bool value)
@@ -288,7 +297,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         LuaAPI.lua_pushboolean(L, value);       // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(int key, LightLuaTable t)
@@ -299,7 +309,8 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         LuaAPI.lua_getref(L, t.reference);      // stack: table, key, table
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
     
     public void Set(int key, LuaTable t)
@@ -310,8 +321,22 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         t.push(L);                              // stack: table, key, table
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
-    }
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
+		
+	}
+	
+	public void Set(int key, Vector2 value)
+	{
+		if(!valid) throw new LuaException("LightLuaTable is invalid");
+		using var _ = LuaUtils.CallNative(out var L);
+		push();                                 // stack: table
+		LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
+		env.translator.Push(L, value);     // stack: table, key, value
+		var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
+	}
+    
     
     public void Set<T>(int key, T value)
     {
@@ -320,9 +345,9 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
         push();                                 // stack: table
         LuaAPI.xlua_pushinteger(L, key);           // stack: table, key
         env.translator.PushByType(L, value);     // stack: table, key, value
-        LuaAPI.xlua_psettable(L, -3);           // stack: table
+        var success = LuaAPI.xlua_psettable(L, -3);           // stack: table
+        if(!LuaUtils.CommonErrorHandler(success, backref)) return;
     }
-    
     #endregion
     
     #region Get functions
@@ -436,7 +461,7 @@ public struct LightLuaTable : IDisposable, IEquatable<LightLuaTable>
     {
         if(!valid) throw new LuaException("LightLuaTable is invalid");
         using var _ = LuaUtils.CallNative(out var L);
-        vm.clearTableFunc.push();                       // stack: func
+        vm.cache.ClearTable.push(L);                       // stack: func
         push();                                         // stack: func, table
         var success = LuaAPI.lua_pcall(L, 1, 0, 0);     // stack: func
         if(!LuaUtils.CommonErrorHandler(success, backref)) return;

@@ -22,16 +22,9 @@ namespace XLua.LuaDLL
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate int lua_CSFunction(IntPtr L);
 
-#if GEN_CODE_MINIMIZE
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate int CSharpWrapperCaller(IntPtr L, int funcidx, int top);
-#endif
 #else
     public delegate int lua_CSFunction(IntPtr L);
 
-#if GEN_CODE_MINIMIZE
-    public delegate int CSharpWrapperCaller(IntPtr L, int funcidx, int top);
-#endif
 #endif
 
 
@@ -603,21 +596,5 @@ namespace XLua.LuaDLL
 
         [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr xlua_gl(IntPtr L);
-
-#if GEN_CODE_MINIMIZE
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void xlua_set_csharp_wrapper_caller(IntPtr wrapper);
-
-        [DllImport(LUADLL, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void xlua_push_csharp_wrapper(IntPtr L, int wrapperID);
-
-        public static void xlua_set_csharp_wrapper_caller(CSharpWrapperCaller wrapper_caller)
-        {
-#if XLUA_GENERAL || (UNITY_WSA && !UNITY_EDITOR)
-            GCHandle.Alloc(wrapper);
-#endif
-            xlua_set_csharp_wrapper_caller(Marshal.GetFunctionPointerForDelegate(wrapper_caller));
-        }
-#endif
     }
 }

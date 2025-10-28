@@ -118,24 +118,18 @@ namespace CSObjectWrapEditor
             TemplateRef template_ref = ScriptableObject.CreateInstance<TemplateRef>();
             
             templateRef = new XLuaTemplates();
-#if GEN_CODE_MINIMIZE
-            templateRef.LuaClassWrap = new XLuaTemplate { name = template_ref.LuaClassWrapGCM.name, text = template_ref.LuaClassWrapGCM.text };
-#else
+			
             templateRef.LuaClassWrap = new XLuaTemplate { name = template_ref.LuaClassWrap.name, text = template_ref.LuaClassWrap.text };
-#endif
+
             templateRef.LuaDelegateBridge = new XLuaTemplate { name = template_ref.LuaDelegateBridge.name, text = template_ref.LuaDelegateBridge.text };
             templateRef.LuaDelegateWrap = new XLuaTemplate { name = template_ref.LuaDelegateWrap.name, text = template_ref.LuaDelegateWrap.text };
-#if GEN_CODE_MINIMIZE
-            templateRef.LuaEnumWrap = new XLuaTemplate { name = template_ref.LuaEnumWrapGCM.name, text = template_ref.LuaEnumWrapGCM.text };
-#else
+
             templateRef.LuaEnumWrap = new XLuaTemplate { name = template_ref.LuaEnumWrap.name, text = template_ref.LuaEnumWrap.text };
-#endif
+
             templateRef.LuaInterfaceBridge = new XLuaTemplate { name = template_ref.LuaInterfaceBridge.name, text = template_ref.LuaInterfaceBridge.text };
-#if GEN_CODE_MINIMIZE
-            templateRef.LuaRegister = new XLuaTemplate { name = template_ref.LuaRegisterGCM.name, text = template_ref.LuaRegisterGCM.text };
-#else
+
             templateRef.LuaRegister = new XLuaTemplate { name = template_ref.LuaRegister.name, text = template_ref.LuaRegister.text };
-#endif
+
             templateRef.LuaWrapPusher = new XLuaTemplate { name = template_ref.LuaWrapPusher.name, text = template_ref.LuaWrapPusher.text };
             templateRef.PackUnpack = new XLuaTemplate { name = template_ref.PackUnpack.name, text = template_ref.PackUnpack.text };
             templateRef.TemplateCommon = new XLuaTemplate { name = template_ref.TemplateCommon.name, text = template_ref.TemplateCommon.text };

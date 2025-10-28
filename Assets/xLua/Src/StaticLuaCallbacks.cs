@@ -124,28 +124,9 @@ namespace XLua
             }
         }
 
-#if GEN_CODE_MINIMIZE
-        [MonoPInvokeCallback(typeof(LuaDLL.CSharpWrapperCaller))]
-        internal static int CSharpWrapperCallerImpl(RealStatePtr L, int funcidx, int top)
-        {
-            try
-            {
-                ObjectTranslator translator = ObjectTranslator.instance;
-                return translator.CallCSharpWrapper(L, funcidx, top);
-            }
-            catch (Exception e)
-            {
-                return LuaAPI.luaL_error(L, "c# exception:" + e);
-            }
-        }
-#endif
 
-#if GEN_CODE_MINIMIZE
-        public static int DelegateCall(RealStatePtr L, int top)
-#else
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         public static int DelegateCall(RealStatePtr L)
-#endif
         {
             try
             {
@@ -201,12 +182,8 @@ namespace XLua
             }
         }
 
-#if GEN_CODE_MINIMIZE
-        public static int DelegateCombine(RealStatePtr L, int top)
-#else
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         public static int DelegateCombine(RealStatePtr L)
-#endif
         {
             try
             {
@@ -227,12 +204,8 @@ namespace XLua
             }
         }
 
-#if GEN_CODE_MINIMIZE
-        public static int DelegateRemove(RealStatePtr L, int top)
-#else
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         public static int DelegateRemove(RealStatePtr L)
-#endif
         {
             try
             {
@@ -338,12 +311,8 @@ namespace XLua
             return ok;
         }
 
-#if GEN_CODE_MINIMIZE
-        public static int ArrayIndexer(RealStatePtr L, int top)
-#else
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         public static int ArrayIndexer(RealStatePtr L)
-#endif
         {
             try
             {
@@ -498,12 +467,8 @@ namespace XLua
             return ok;
         }
 
-#if GEN_CODE_MINIMIZE
-        public static int ArrayNewIndexer(RealStatePtr L, int top)
-#else
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         public static int ArrayNewIndexer(RealStatePtr L)
-#endif
         {
             try
             {
@@ -554,12 +519,8 @@ namespace XLua
             }
         }
 
-#if GEN_CODE_MINIMIZE
-        public static int ArrayLength(RealStatePtr L, int top)
-#else
         [MonoPInvokeCallback(typeof(LuaCSFunction))]
         public static int ArrayLength(RealStatePtr L)
-#endif
         {
             try
             {
